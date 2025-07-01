@@ -11,7 +11,8 @@
             @csrf
             <input type="hidden" name="confirm" value="1">
             <div class="mb-6">
-                <select name="allergy_id" id="allergy_id" class="block w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300">
+                <select name="allergy_id" id="allergy_id" required class="block w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300">
+                    <option value="" disabled selected>Kies een allergie</option>
                     @foreach($allergies as $allergy)
                         <option value="{{ $allergy->id }}"
                             {{ (isset($selected_allergy_id) ? $selected_allergy_id : old('allergy_id', $currentAllergyId)) == $allergy->id ? 'selected' : '' }}>
@@ -57,7 +58,8 @@
         <form method="POST" action="{{ route('allergies.person.update', ['personId' => $person->id]) }}">
             @csrf
             <div class="mb-6">
-                <select name="allergy_id" id="allergy_id" class="block w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300">
+                <select name="allergy_id" id="allergy_id" required class="block w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-300">
+                    <option value="" disabled selected>Kies een allergie</option>
                     @foreach($allergies as $allergy)
                         <option value="{{ $allergy->id }}"
                             {{ (old('allergy_id', $currentAllergyId) == $allergy->id) ? 'selected' : '' }}>
