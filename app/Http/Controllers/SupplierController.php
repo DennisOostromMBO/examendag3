@@ -4,29 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\Supplier;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SupplierController extends Controller
 {
+    /**
+     * Toon het overzicht van leveranciers met filtermogelijkheid op type.
+     */
     public function index(Request $request)
     {
-        $types = DB::table('suppliers')->select('supplier_type')->distinct()->pluck('supplier_type');
-        $selectedType = $request->get('supplier_type');
+        try {
+            // Haal alle unieke supplier types op voor de dropdown
+            $types = Supplier::getAllTypes();
+            $selectedType = $request->get('supplier_type');
 
-        if ($selectedType) {
-            $suppliers = DB::select('CALL spGetAllSuppliers()');
-            // Filter suppliers in PHP omdat stored procedure geen WHERE accepteert
-            $suppliers = collect($suppliers)->where('supplier_type', $selectedType);
-        } else {
-            $suppliers = DB::select('CALL spGetAllSuppliers()');
+            // Haal alle suppliers op via de stored procedure, filter indien nodig
+            $suppliers = Supplier::getAllWithContactInfo($selectedType);
+
+            return view('suppliers.index', [
+                'suppliers' => $suppliers,
+                'types' => $types,
+                'selectedType' => $selectedType,
+            ]);
+        } catch (\Throwable $e) {
+            // Log de fout en toon een foutmelding
+            Log::error('Fout bij ophalen leveranciers: ' . $e->getMessage());
+            return back()->with('error', 'Er is een fout opgetreden bij het ophalen van de leveranciers.');
         }
-
-        return view('suppliers.index', [
-            'suppliers' => $suppliers,
-            'types' => $types,
-            'selectedType' => $selectedType,
-        ]);
     }
 }
