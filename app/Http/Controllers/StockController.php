@@ -6,6 +6,9 @@ use App\Services\ProductStockService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 /**
  * StockController
@@ -60,41 +63,59 @@ class StockController extends Controller
      */
     public function index(Request $request): View
     {
-        // Get the category filter from request parameters (optional)
-        $categoryFilter = $request->get('category');
+        try {
+            // Get the category filter from request parameters (optional)
+            $categoryFilter = $request->get('category');
 
-        // Get current page number from request (default to 1)
-        $currentPage = $request->get('page', 1);
-        $perPage = 10; // Items per page
+            // Get current page number from request (default to 1)
+            $currentPage = $request->get('page', 1);
+            $perPage = 10; // Items per page
 
-        // Fetch stock data using stored procedures - filtered by category if provided
-        $allStocks = $this->productStockService->getStockOverview($categoryFilter);
+            // Fetch stock data using stored procedures - filtered by category if provided
+            $allStocks = $this->productStockService->getStockOverview($categoryFilter);
 
-        // Convert to Laravel collection for pagination
-        $stocksCollection = collect($allStocks);
+            // Convert to Laravel collection for pagination
+            $stocksCollection = collect($allStocks);
 
-        // Calculate pagination variables
-        $total = $stocksCollection->count();
-        $offset = ($currentPage - 1) * $perPage;
+            // Calculate pagination variables
+            $total = $stocksCollection->count();
+            $offset = ($currentPage - 1) * $perPage;
 
-        // Get items for current page
-        $stocks = $stocksCollection->slice($offset, $perPage)->values();
+            // Get items for current page
+            $stocks = $stocksCollection->slice($offset, $perPage)->values();
 
-        // Create pagination data
-        $pagination = [
-            'current_page' => (int) $currentPage,
-            'per_page' => $perPage,
-            'total' => $total,
-            'last_page' => ceil($total / $perPage),
-            'from' => $offset + 1,
-            'to' => min($offset + $perPage, $total)
-        ];
+            // Create pagination data
+            $pagination = [
+                'current_page' => (int) $currentPage,
+                'per_page' => $perPage,
+                'total' => $total,
+                'last_page' => ceil($total / $perPage),
+                'from' => $offset + 1,
+                'to' => min($offset + $perPage, $total)
+            ];
 
-        // Get all active categories for the filter dropdown
-        $categories = $this->productStockService->getActiveCategories();
+            // Get all active categories for the filter dropdown
+            $categories = $this->productStockService->getActiveCategories();
 
-        // Return view with all necessary data for the stock overview page
-        return view('stocks.index', compact('stocks', 'categories', 'categoryFilter', 'pagination'));
+            // Return view with all necessary data for the stock overview page
+            return view('stocks.index', compact('stocks', 'categories', 'categoryFilter', 'pagination'));
+        } catch (\Exception $e) {
+            // Log the error with context for debugging
+            Log::error('Error in stock index method: ' . $e->getMessage(), [
+                'category_filter' => $categoryFilter ?? null,
+                'current_page' => $currentPage ?? 1,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Return view with empty data and error message
+            return view('stocks.index', [
+                'stocks' => [],
+                'categories' => [],
+                'categoryFilter' => $categoryFilter,
+                'pagination' => null
+            ])->with('error', 'Er is een fout opgetreden bij het laden van de voorraad. Probeer het later opnieuw.');
+        }
     }
 
     /**
@@ -115,19 +136,36 @@ class StockController extends Controller
      */
     public function showProduct($id)
     {
-        // Retrieve product details from the service layer
-        $product = $this->productStockService->getProductDetails($id);
+        try {
+            // Retrieve product details from the service layer
+            $product = $this->productStockService->getProductDetails($id);
 
-        // Check if product exists - redirect with error if not found
-        if (!$product) {
-            return redirect()->route('stocks.overview')->with('error', 'Product niet gevonden.');
+            // Check if product exists - redirect with error if not found
+            if (!$product) {
+                Log::warning('Product not found in showProduct method', [
+                    'product_id' => $id,
+                    'user_id' => Auth::id()
+                ]);
+                return redirect()->route('stocks.overview')->with('error', 'Product niet gevonden.');
+            }
+
+            // Get additional stock information (quantities, dates, warehouse info)
+            $stockInfo = $this->productStockService->getProductStockInfo($id);
+
+            // Return the product details view with all relevant data
+            return view('stocks.product-show', compact('product', 'stockInfo'));
+        } catch (\Exception $e) {
+            // Log the error with context
+            Log::error('Error in showProduct method: ' . $e->getMessage(), [
+                'product_id' => $id,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Redirect back to overview with error message
+            return redirect()->route('stocks.overview')
+                           ->with('error', 'Er is een fout opgetreden bij het laden van de productdetails.');
         }
-
-        // Get additional stock information (quantities, dates, warehouse info)
-        $stockInfo = $this->productStockService->getProductStockInfo($id);
-
-        // Return the product details view with all relevant data
-        return view('stocks.product-show', compact('product', 'stockInfo'));
     }
 
     /**
@@ -148,22 +186,39 @@ class StockController extends Controller
      */
     public function editProduct($id)
     {
-        // Get product details for the edit form
-        $product = $this->productStockService->getProductDetails($id);
+        try {
+            // Get product details for the edit form
+            $product = $this->productStockService->getProductDetails($id);
 
-        // Verify product exists before showing edit form
-        if (!$product) {
-            return redirect()->route('stocks.overview')->with('error', 'Product niet gevonden.');
+            // Verify product exists before showing edit form
+            if (!$product) {
+                Log::warning('Product not found in editProduct method', [
+                    'product_id' => $id,
+                    'user_id' => Auth::id()
+                ]);
+                return redirect()->route('stocks.overview')->with('error', 'Product niet gevonden.');
+            }
+
+            // Get current stock information to pre-populate form fields
+            $stockInfo = $this->productStockService->getProductStockInfo($id);
+
+            // Get categories for any category-related form fields
+            $categories = $this->productStockService->getActiveCategories();
+
+            // Return edit form with all necessary data
+            return view('stocks.product-edit', compact('product', 'stockInfo', 'categories'));
+        } catch (\Exception $e) {
+            // Log the error with context
+            Log::error('Error in editProduct method: ' . $e->getMessage(), [
+                'product_id' => $id,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Redirect back to overview with error message
+            return redirect()->route('stocks.overview')
+                           ->with('error', 'Er is een fout opgetreden bij het laden van het bewerkingsformulier.');
         }
-
-        // Get current stock information to pre-populate form fields
-        $stockInfo = $this->productStockService->getProductStockInfo($id);
-
-        // Get categories for any category-related form fields
-        $categories = $this->productStockService->getActiveCategories();
-
-        // Return edit form with all necessary data
-        return view('stocks.product-edit', compact('product', 'stockInfo', 'categories'));
     }
 
     /**
@@ -191,37 +246,82 @@ class StockController extends Controller
      */
     public function updateProduct(Request $request, $id): RedirectResponse
     {
-        // Validate incoming form data
-        $request->validate([
-            'delivered_quantity' => 'required|integer|min:0',  // Must be non-negative integer
-            'delivery_date' => 'nullable|date'                 // Optional date field
-        ]);
+        try {
+            // Validate incoming form data
+            $request->validate([
+                'delivered_quantity' => 'required|integer|min:0',  // Must be non-negative integer
+                'delivery_date' => 'nullable|date'                 // Optional date field
+            ]);
 
-        // Delegate business logic to service layer
-        // Service handles database operations and business rules
-        $result = $this->productStockService->updateDeliveredQuantity(
-            $id,
-            $request->delivered_quantity,
-            $request->delivery_date
-        );
+            // Delegate business logic to service layer
+            // Service handles database operations and business rules
+            $result = $this->productStockService->updateDeliveredQuantity(
+                $id,
+                $request->delivered_quantity,
+                $request->delivery_date
+            );
 
-        // Handle successful update
-        if ($result['success']) {
-            return redirect()->route('stocks.product.show', $id)
-                           ->with('success', 'De productgegevens zijn gewijzigd');
-        } else {
-            // Handle specific business logic failures
-            if ($result['result'] === 'INSUFFICIENT_STOCK') {
-                // Insufficient stock error - return to form with specific message
-                return redirect()->back()
-                               ->with('error', 'Er worden meer producten uitgeleverd dan er in voorraad zijn')
-                               ->withInput();  // Preserve user input
+            // Handle successful update
+            if ($result['success']) {
+                Log::info('Product updated successfully', [
+                    'product_id' => $id,
+                    'delivered_quantity' => $request->delivered_quantity,
+                    'delivery_date' => $request->delivery_date,
+                    'user_id' => Auth::id()
+                ]);
+
+                return redirect()->route('stocks.product.show', $id)
+                               ->with('success', 'De productgegevens zijn gewijzigd');
             } else {
-                // Generic error handling for other failures
-                return redirect()->back()
-                               ->with('error', 'Er is een fout opgetreden bij het bijwerken.')
-                               ->withInput();  // Preserve user input
+                // Handle specific business logic failures
+                if ($result['result'] === 'INSUFFICIENT_STOCK') {
+                    Log::warning('Insufficient stock error in updateProduct', [
+                        'product_id' => $id,
+                        'requested_quantity' => $request->delivered_quantity,
+                        'available_stock' => $result['current_stock'] ?? 0,
+                        'user_id' => Auth::id()
+                    ]);
+
+                    // Insufficient stock error - return to form with specific message
+                    return redirect()->back()
+                                   ->with('error', 'Er worden meer producten uitgeleverd dan er in voorraad zijn')
+                                   ->withInput();  // Preserve user input
+                } else {
+                    Log::error('Business logic error in updateProduct', [
+                        'product_id' => $id,
+                        'result' => $result['result'] ?? 'unknown',
+                        'user_id' => Auth::id()
+                    ]);
+
+                    // Generic error handling for other failures
+                    return redirect()->back()
+                                   ->with('error', 'Er is een fout opgetreden bij het bijwerken.')
+                                   ->withInput();  // Preserve user input
+                }
             }
+        } catch (ValidationException $e) {
+            // Handle validation errors specifically
+            Log::warning('Validation error in updateProduct', [
+                'product_id' => $id,
+                'errors' => $e->errors(),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()
+                           ->withErrors($e->errors())
+                           ->withInput();
+        } catch (\Exception $e) {
+            // Handle unexpected errors
+            Log::error('Unexpected error in updateProduct: ' . $e->getMessage(), [
+                'product_id' => $id,
+                'request_data' => $request->all(),
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()
+                           ->with('error', 'Er is een onverwachte fout opgetreden. Probeer het later opnieuw.')
+                           ->withInput();
         }
     }
 
@@ -240,16 +340,33 @@ class StockController extends Controller
      */
     public function showWarehouse($id)
     {
-        // Retrieve warehouse details from service layer
-        $warehouse = $this->productStockService->getWarehouseDetails($id);
+        try {
+            // Retrieve warehouse details from service layer
+            $warehouse = $this->productStockService->getWarehouseDetails($id);
 
-        // Check if warehouse exists - redirect with error if not found
-        if (!$warehouse) {
-            return redirect()->route('stocks.overview')->with('error', 'Magazijn niet gevonden.');
+            // Check if warehouse exists - redirect with error if not found
+            if (!$warehouse) {
+                Log::warning('Warehouse not found in showWarehouse method', [
+                    'warehouse_id' => $id,
+                    'user_id' => Auth::id()
+                ]);
+                return redirect()->route('stocks.overview')->with('error', 'Magazijn niet gevonden.');
+            }
+
+            // Return warehouse details view
+            return view('stocks.warehouse-details', compact('warehouse'));
+        } catch (\Exception $e) {
+            // Log the error with context
+            Log::error('Error in showWarehouse method: ' . $e->getMessage(), [
+                'warehouse_id' => $id,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Redirect back to overview with error message
+            return redirect()->route('stocks.overview')
+                           ->with('error', 'Er is een fout opgetreden bij het laden van de magazijndetails.');
         }
-
-        // Return warehouse details view
-        return view('stocks.warehouse-details', compact('warehouse'));
     }
 
     /**
