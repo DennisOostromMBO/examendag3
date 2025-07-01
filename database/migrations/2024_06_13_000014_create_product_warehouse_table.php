@@ -13,6 +13,7 @@ class CreateProductWarehouseTable extends Migration
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('warehouse_id');
             $table->string('location');
+            $table->integer('delivered_quantity')->default(0);
             $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on('products')->cascadeOnDelete();

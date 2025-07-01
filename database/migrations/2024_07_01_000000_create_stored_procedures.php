@@ -2,12 +2,17 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateStoredProcedures extends Migration
 {
     public function up()
     {
-        // Install stored procedures for product stock management
+        // First, add the delivered_quantity column to product_warehouse table
+        $this->addDeliveredQuantityColumn();
+        
+        // Then install all stored procedures
         $this->createGetProductStockOverviewProcedure();
         $this->createGetActiveCategoriesProcedure();
         $this->createUpdateProductProcedure();
@@ -18,25 +23,40 @@ class CreateStoredProcedures extends Migration
 
     public function down()
     {
+        // Drop stored procedures
         DB::unprepared('DROP PROCEDURE IF EXISTS GetProductStockOverview');
         DB::unprepared('DROP PROCEDURE IF EXISTS GetActiveCategories');
         DB::unprepared('DROP PROCEDURE IF EXISTS UpdateProduct');
         DB::unprepared('DROP PROCEDURE IF EXISTS GetProductDetails');
         DB::unprepared('DROP PROCEDURE IF EXISTS UpdateWarehouse');
         DB::unprepared('DROP PROCEDURE IF EXISTS GetWarehouseDetails');
+        
+        // Remove the delivered_quantity column
+        Schema::table('product_warehouse', function (Blueprint $table) {
+            $table->dropColumn('delivered_quantity');
+        });
+    }
+
+    private function addDeliveredQuantityColumn()
+    {
+        if (!Schema::hasColumn('product_warehouse', 'delivered_quantity')) {
+            Schema::table('product_warehouse', function (Blueprint $table) {
+                $table->integer('delivered_quantity')->default(0)->after('location');
+            });
+        }
     }
 
     private function createGetProductStockOverviewProcedure()
     {
         DB::unprepared('DROP PROCEDURE IF EXISTS GetProductStockOverview');
-        
+
         $procedure = "
         CREATE PROCEDURE GetProductStockOverview(
             IN p_category_filter VARCHAR(255)
         )
         BEGIN
             IF p_category_filter IS NULL OR p_category_filter = 'all' OR p_category_filter = '' THEN
-                SELECT 
+                SELECT
                     p.id as product_id,
                     p.name as item_name,
                     c.name as category,
@@ -53,7 +73,7 @@ class CreateStoredProcedures extends Migration
                 WHERE p.is_active = 1 AND c.is_active = 1 AND w.is_active = 1
                 ORDER BY p.name ASC;
             ELSE
-                SELECT 
+                SELECT
                     p.id as product_id,
                     p.name as item_name,
                     c.name as category,
@@ -67,10 +87,10 @@ class CreateStoredProcedures extends Migration
                 INNER JOIN categories c ON p.category_id = c.id
                 INNER JOIN product_warehouse pw ON p.id = pw.product_id
                 INNER JOIN warehouses w ON pw.warehouse_id = w.id
-                WHERE p.is_active = 1 
-                AND c.is_active = 1 
+                WHERE p.is_active = 1
+                AND c.is_active = 1
                 AND w.is_active = 1
-                AND c.name = p_category_filter
+                AND c.name COLLATE utf8mb4_unicode_ci = p_category_filter COLLATE utf8mb4_unicode_ci
                 ORDER BY p.name ASC;
             END IF;
         END";
@@ -81,15 +101,15 @@ class CreateStoredProcedures extends Migration
     private function createGetActiveCategoriesProcedure()
     {
         DB::unprepared('DROP PROCEDURE IF EXISTS GetActiveCategories');
-        
+
         $procedure = "
         CREATE PROCEDURE GetActiveCategories()
         BEGIN
-            SELECT 
+            SELECT
                 id,
                 name,
                 description
-            FROM categories 
+            FROM categories
             WHERE is_active = 1
             ORDER BY name ASC;
         END";
@@ -100,7 +120,7 @@ class CreateStoredProcedures extends Migration
     private function createUpdateProductProcedure()
     {
         DB::unprepared('DROP PROCEDURE IF EXISTS UpdateProduct');
-        
+
         $procedure = "
         CREATE PROCEDURE UpdateProduct(
             IN p_product_id BIGINT,
@@ -123,8 +143,8 @@ class CreateStoredProcedures extends Migration
 
             START TRANSACTION;
 
-            UPDATE products 
-            SET 
+            UPDATE products
+            SET
                 name = p_name,
                 category_id = p_category_id,
                 allergy_type = p_allergy_type,
@@ -138,7 +158,7 @@ class CreateStoredProcedures extends Migration
             WHERE id = p_product_id;
 
             COMMIT;
-            
+
             SELECT ROW_COUNT() as affected_rows;
         END";
 
@@ -148,13 +168,13 @@ class CreateStoredProcedures extends Migration
     private function createGetProductDetailsProcedure()
     {
         DB::unprepared('DROP PROCEDURE IF EXISTS GetProductDetails');
-        
+
         $procedure = "
         CREATE PROCEDURE GetProductDetails(
             IN p_product_id BIGINT
         )
         BEGIN
-            SELECT 
+            SELECT
                 p.id,
                 p.name,
                 p.category_id,
@@ -179,7 +199,7 @@ class CreateStoredProcedures extends Migration
     private function createUpdateWarehouseProcedure()
     {
         DB::unprepared('DROP PROCEDURE IF EXISTS UpdateWarehouse');
-        
+
         $procedure = "
         CREATE PROCEDURE UpdateWarehouse(
             IN p_warehouse_id BIGINT,
@@ -199,8 +219,8 @@ class CreateStoredProcedures extends Migration
 
             START TRANSACTION;
 
-            UPDATE warehouses 
-            SET 
+            UPDATE warehouses
+            SET
                 received_date = p_received_date,
                 delivery_date = p_delivery_date,
                 package_unit = p_package_unit,
@@ -211,7 +231,7 @@ class CreateStoredProcedures extends Migration
             WHERE id = p_warehouse_id;
 
             COMMIT;
-            
+
             SELECT ROW_COUNT() as affected_rows;
         END";
 
@@ -221,13 +241,13 @@ class CreateStoredProcedures extends Migration
     private function createGetWarehouseDetailsProcedure()
     {
         DB::unprepared('DROP PROCEDURE IF EXISTS GetWarehouseDetails');
-        
+
         $procedure = "
         CREATE PROCEDURE GetWarehouseDetails(
             IN p_warehouse_id BIGINT
         )
         BEGIN
-            SELECT 
+            SELECT
                 w.id,
                 w.received_date,
                 w.delivery_date,

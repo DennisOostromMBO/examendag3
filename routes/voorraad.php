@@ -9,6 +9,7 @@ Route::get('/overzicht-productvoorraden', [StockController::class, 'index'])->na
 
 // Product management routes
 Route::get('/product/{id}', [StockController::class, 'showProduct'])->name('stocks.product.show');
+Route::get('/product/{id}/edit', [StockController::class, 'editProduct'])->name('stocks.product.edit');
 Route::put('/product/{id}', [StockController::class, 'updateProduct'])->name('stocks.product.update');
 
 // Warehouse management routes

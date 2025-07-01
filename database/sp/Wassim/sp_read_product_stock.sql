@@ -1,4 +1,5 @@
 -- Stored procedure to read product stock overview with filters
+-- Fixed collation issue for category filtering
 DELIMITER $$
 
 CREATE PROCEDURE GetProductStockOverview(
@@ -6,7 +7,7 @@ CREATE PROCEDURE GetProductStockOverview(
 )
 BEGIN
     IF p_category_filter IS NULL OR p_category_filter = 'all' OR p_category_filter = '' THEN
-        SELECT 
+        SELECT
             p.id as product_id,
             p.name as item_name,
             c.name as category,
@@ -23,7 +24,7 @@ BEGIN
         WHERE p.is_active = 1 AND c.is_active = 1 AND w.is_active = 1
         ORDER BY p.name ASC;
     ELSE
-        SELECT 
+        SELECT
             p.id as product_id,
             p.name as item_name,
             c.name as category,
@@ -37,10 +38,10 @@ BEGIN
         INNER JOIN categories c ON p.category_id = c.id
         INNER JOIN product_warehouse pw ON p.id = pw.product_id
         INNER JOIN warehouses w ON pw.warehouse_id = w.id
-        WHERE p.is_active = 1 
-        AND c.is_active = 1 
+        WHERE p.is_active = 1
+        AND c.is_active = 1
         AND w.is_active = 1
-        AND c.name = p_category_filter
+        AND c.name COLLATE utf8mb4_unicode_ci = p_category_filter COLLATE utf8mb4_unicode_ci
         ORDER BY p.name ASC;
     END IF;
 END$$

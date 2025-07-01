@@ -5,7 +5,7 @@ CREATE PROCEDURE GetProductDetails(
     IN p_product_id BIGINT
 )
 BEGIN
-    SELECT 
+    SELECT
         p.id,
         p.name,
         p.category_id,

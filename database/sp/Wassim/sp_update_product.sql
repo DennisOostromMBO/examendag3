@@ -22,8 +22,8 @@ BEGIN
 
     START TRANSACTION;
 
-    UPDATE products 
-    SET 
+    UPDATE products
+    SET
         name = p_name,
         category_id = p_category_id,
         allergy_type = p_allergy_type,
@@ -37,7 +37,7 @@ BEGIN
     WHERE id = p_product_id;
 
     COMMIT;
-    
+
     SELECT ROW_COUNT() as affected_rows;
 END$$
 

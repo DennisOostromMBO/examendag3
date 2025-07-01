@@ -15,9 +15,9 @@
                     <option value="all" {{ !$categoryFilter || $categoryFilter === 'all' ? 'selected' : '' }}>
                         Selecteer Categorie
                     </option>
-                    @foreach($categories as $code => $name)
-                        <option value="{{ $code }}" {{ $categoryFilter === $code ? 'selected' : '' }}>
-                            {{ $code }}
+                    @foreach($categories as $categoryName => $categoryId)
+                        <option value="{{ $categoryName }}" {{ $categoryFilter === $categoryName ? 'selected' : '' }}>
+                            {{ $categoryName }}
                         </option>
                     @endforeach
                 </select>
@@ -65,15 +65,10 @@
     @else
         <!-- Empty State -->
         <div class="text-center py-5">
-            @if($categoryFilter && $categoryFilter !== 'all')
-                <div class="alert alert-warning d-inline-block">
-                    Er zijn geen producten bekend die behoren bij de geselecteerde productcategorie
-                </div>
-            @else
-                <div class="alert alert-light d-inline-block">
-                    Geen voorraadproducten gevonden.
-                </div>
-            @endif
+            <div class="alert alert-warning d-inline-block">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Er zijn geen producten bekend die behoren bij de geselecteerde categorieen
+            </div>
         </div>
     @endif
 

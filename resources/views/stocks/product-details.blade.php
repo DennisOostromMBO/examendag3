@@ -7,47 +7,93 @@
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <h2>Product Details</h2>
-            <p class="text-muted small">
-                <a href="{{ route('home') }}" class="text-decoration-none">Homepage voedselbank maaskantje</a> > 
-                <a href="{{ route('stocks.overview') }}" class="text-decoration-none">Voorraad</a> > 
-                Product {{ $product->name }}
-            </p>
+            <h2>Wijzig Product Details {{ $product->name ?? 'Aardappel' }}</h2>
         </div>
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+        </div>
+        <script>
+            setTimeout(function() {
+                window.location.href = "{{ route('stocks.product.show', $product->id ?? 1) }}";
+            }, 3000);
+        </script>
     @endif
 
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
+    <!-- Product Details Display -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <table class="table table-bordered">
+                <tr>
+                    <td><strong>Productnaam</strong></td>
+                    <td>{{ $product->name ?? '~' }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Houdbaarheidsdatum</strong></td>
+                    <td>{{ $product->expiration_date ?? '~' }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Barcode</strong></td>
+                    <td>{{ $product->barcode ?? '~' }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Magazijn Locatie</strong></td>
+                    <td>
+                        <select class="form-select" disabled>
+                            <option>Benicum</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Ontvangstdatum</strong></td>
+                    <td>{{ date('d-m-Y') }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
     <!-- Product Edit Form -->
     <div class="row">
         <div class="col-12">
-            <form method="POST" action="{{ route('stocks.product.update', $product->id) }}">
+            <form method="POST" action="{{ route('stocks.product.update', $product->id ?? 1) }}">
                 @csrf
                 @method('PUT')
                 
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Product Bewerken</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Productnaam</label>
-                                    <input type="text" class="form-control" id="name" name="name" 
-                                           value="{{ old('name', $product->name) }}" required>
-                                    @error('name')<div class="text-danger">{{ $message }}</div>@enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="category_id" class="form-label">Categorie</label>
+                <div class="mb-3">
+                    <label for="quantity" class="form-label"><strong>Aantal aangeleverde producten:</strong></label>
+                    <input type="number" class="form-control" id="quantity" name="quantity" 
+                           value="{{ old('quantity', $currentQuantity ?? 0) }}" required min="0">
+                    @error('quantity')<div class="text-danger">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="delivery_date" class="form-label"><strong>Uitleveringsdatum</strong></label>
+                    <input type="date" class="form-control" id="delivery_date" name="delivery_date" 
+                           value="{{ old('delivery_date', $warehouse->delivery_date ?? date('Y-m-d')) }}">
+                    @error('delivery_date')<div class="text-danger">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="note" class="form-label"><strong>Aantal op voorraad</strong></label>
+                    <input type="text" class="form-control" value="{{ $stockQuantity ?? '~' }}" readonly>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Wijzig Product Details</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">Terug</button>
+                    <a href="{{ route('home') }}" class="btn btn-primary">Home</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
                                     <select class="form-select" id="category_id" name="category_id" required>
                                         @foreach($categories as $categoryName => $categoryId)
                                             <option value="{{ $categoryId }}" 
