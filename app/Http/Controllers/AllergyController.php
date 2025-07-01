@@ -54,17 +54,7 @@ class AllergyController extends Controller
         $currentAllergyId = DB::table('allergy_person')->where('person_id', $personId)->pluck('allergy_id')->first();
         $currentAllergy = $allergies->firstWhere('id', $currentAllergyId);
 
-        // Check for high-risk allergy (e.g. "Pinda's")
-        if ($currentAllergy && strtolower($currentAllergy->name) === "pinda's" && !request()->has('confirm')) {
-            // Show warning with a button to continue
-            return view('allergies.edit_person_allergy_warning', [
-                'person' => $person,
-                'currentAllergy' => $currentAllergy,
-                'allergies' => $allergies,
-                'currentAllergyId' => $currentAllergyId,
-            ]);
-        }
-
+        // No more separate warning view, always show edit page
         return view('allergies.edit_person_allergy', compact('person', 'allergies', 'currentAllergyId'));
     }
 
@@ -97,6 +87,8 @@ class AllergyController extends Controller
             ->with('success', 'De wijziging is doorgevoerd');
     }
 }
+
+    
 
 
 
