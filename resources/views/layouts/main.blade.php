@@ -43,6 +43,15 @@
                     <a href="{{ route('stocks.overview') }}" class="text-gray-600 hover:text-green-600 px-3 py-2 text-sm font-medium {{ request()->routeIs('stocks.*') ? 'text-green-600 border-b-2 border-green-600' : '' }}">
                         Voorraad
                     </a>
+                    <a href="{{ route('allergies.index') }}" class="text-gray-600 hover:text-green-600 px-3 py-2 text-sm font-medium {{ request()->routeIs('allergies.*') ? 'text-green-600 border-b-2 border-green-600' : '' }}">
+                        Allergieën
+                    </a>
+                    <a href="{{ route('food-packages.index') }}" class="text-gray-600 hover:text-green-600 px-3 py-2 text-sm font-medium {{ request()->routeIs('food-packages.*') ? 'text-green-600 border-b-2 border-green-600' : '' }}">
+                        Voedselpakketten
+                    </a>
+                    <a href="{{ route('suppliers.index') }}" class="text-gray-600 hover:text-green-600 px-3 py-2 text-sm font-medium {{ request()->routeIs('suppliers.*') ? 'text-green-600 border-b-2 border-green-600' : '' }}">
+                        Leveranciers
+                    </a>
                 </nav>
 
                 <!-- Mobile menu button -->
@@ -63,6 +72,15 @@
                     </a>
                     <a href="{{ route('stocks.overview') }}" class="block px-3 py-2 text-base font-medium text-gray-600 hover:text-green-600 {{ request()->routeIs('stocks.*') ? 'text-green-600' : '' }}">
                         Voorraad
+                    </a>
+                    <a href="{{ route('allergies.index') }}" class="block px-3 py-2 text-base font-medium text-gray-600 hover:text-green-600 {{ request()->routeIs('allergies.*') ? 'text-green-600' : '' }}">
+                        Allergieën
+                    </a>
+                    <a href="{{ route('food-packages.index') }}" class="block px-3 py-2 text-base font-medium text-gray-600 hover:text-green-600 {{ request()->routeIs('food-packages.*') ? 'text-green-600' : '' }}">
+                        Voedselpakketten
+                    </a>
+                    <a href="{{ route('suppliers.index') }}" class="block px-3 py-2 text-base font-medium text-gray-600 hover:text-green-600 {{ request()->routeIs('suppliers.*') ? 'text-green-600' : '' }}">
+                        Leveranciers
                     </a>
                 </div>
             </div>
