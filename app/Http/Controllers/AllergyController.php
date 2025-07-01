@@ -27,7 +27,10 @@ class AllergyController extends Controller
     // Show all allergies for a family
     public function familyAllergies($familyId)
     {
-        $family = \App\Models\Family::findOrFail($familyId);
+        $family = DB::table('families')->where('id', $familyId)->first();
+        if (!$family) {
+            abort(404);
+        }
         $persons = Person::where('family_id', $familyId)->get();
         $allergies = \App\Models\Allergy::all();
 
