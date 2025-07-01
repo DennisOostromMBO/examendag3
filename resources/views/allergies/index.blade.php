@@ -61,9 +61,17 @@
                         </td>
                     </tr>
                     @empty
-                    <tr>
-                        <td colspan="7" class="text-center">Geen gezinnen gevonden.</td>
-                    </tr>
+                        @if($selectedAllergy)
+                        <tr>
+                            <td colspan="7" class="text-center text-danger">
+                                Er zijn geen gezinnen bekent die de geselecteerde allergie hebben
+                            </td>
+                        </tr>
+                        @else
+                        <tr>
+                            <td colspan="7" class="text-center">Geen gezinnen gevonden.</td>
+                        </tr>
+                        @endif
                     @endforelse
                 </tbody>
             </table>
