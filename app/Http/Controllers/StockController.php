@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Stock;
-use App\Models\Supplier;
+use App\Services\ProductStockService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class StockController extends Controller
 {
+    protected $productStockService;
+
+    public function __construct(ProductStockService $productStockService)
+    {
+        $this->productStockService = $productStockService;
+    }
+
     /**
      * Display the stock overview page (Overzicht Productvoorraden)
      */
@@ -17,100 +23,118 @@ class StockController extends Controller
     {
         $categoryFilter = $request->get('category');
 
-        // Placeholder: In real implementation, this would fetch from database
-        // For now, we'll use placeholder data to show the UI structure
-        $stocks = $this->getPlaceholderStockData($categoryFilter);
-        $categories = $this->getPlaceholderCategories();
+        // Use stored procedures to get data
+        $stocks = $this->productStockService->getStockOverview($categoryFilter);
+        $categories = $this->productStockService->getActiveCategories();
 
         return view('stocks.index', compact('stocks', 'categories', 'categoryFilter'));
     }
 
     /**
-     * Get placeholder stock data for demonstration
+     * Show product details (read-only view)
      */
-    private function getPlaceholderStockData($categoryFilter = null)
+    public function showProduct($id)
     {
-        // Placeholder data - replace with actual database query
-        $allStocks = [
-            [
-                'id' => 1,
-                'item_name' => 'Brood Wit',
-                'category' => 'AGF',
-                'unit' => 'stuks',
-                'quantity' => 50,
-                'expiry_date' => '2025-07-15',
-                'supplier' => 'Bakkerij Jansen'
-            ],
-            [
-                'id' => 2,
-                'item_name' => 'Appels',
-                'category' => 'AGF',
-                'unit' => 'kg',
-                'quantity' => 25,
-                'expiry_date' => '2025-07-10',
-                'supplier' => 'Fruithandel Peters'
-            ],
-            [
-                'id' => 3,
-                'item_name' => 'Bananen',
-                'category' => 'AGF',
-                'unit' => 'kg',
-                'quantity' => 30,
-                'expiry_date' => '2025-07-08',
-                'supplier' => 'Fruithandel Peters'
-            ],
-            [
-                'id' => 4,
-                'item_name' => 'Melk Halfvol',
-                'category' => 'ZPE',
-                'unit' => 'liter',
-                'quantity' => 40,
-                'expiry_date' => '2025-07-12',
-                'supplier' => 'Zuivelhoeve'
-            ],
-            [
-                'id' => 5,
-                'item_name' => 'Yoghurt Naturel',
-                'category' => 'ZPE',
-                'unit' => 'bekers',
-                'quantity' => 15,
-                'expiry_date' => '2025-07-09',
-                'supplier' => 'Zuivelhoeve'
-            ]
-        ];
+        $product = $this->productStockService->getProductDetails($id);
 
-        // Filter by category if specified
-        if ($categoryFilter && $categoryFilter !== 'all') {
-            $filteredStocks = array_filter($allStocks, function($stock) use ($categoryFilter) {
-                return $stock['category'] === $categoryFilter;
-            });
-
-            // Return empty array for 'BVH' to demonstrate the empty state message
-            if ($categoryFilter === 'BVH') {
-                return [];
-            }
-
-            return array_values($filteredStocks);
+        if (!$product) {
+            return redirect()->route('stocks.overview')->with('error', 'Product niet gevonden.');
         }
 
-        return $allStocks;
+        $stockInfo = $this->productStockService->getProductStockInfo($id);
+
+        return view('stocks.product-show', compact('product', 'stockInfo'));
     }
 
     /**
-     * Get placeholder categories for demonstration
+     * Show product edit form
      */
-    private function getPlaceholderCategories()
+    public function editProduct($id)
     {
-        return [
-            'AGF' => 'Aardappelen, Groenten en Fruit',
-            'KV' => 'Kant en Klaar Voeding',
-            'ZPE' => 'Zuivel, Plantaardig en Eieren',
-            'BB' => 'Brood en Banket',
-            'FSKT' => 'Frisdrank, Sappen, Koffie en Thee',
-            'PRW' => 'Pasta, Rijst en Wereldkeukens',
-            'SSKO' => 'Soepen, Sauzen, Kruiden en Oliën',
-            'SKGC' => 'Snoep, Koek, Gebak en Chocolade',
-            'BVH' => 'Baby Voeding en Hygiëne'
-        ];
+        $product = $this->productStockService->getProductDetails($id);
+
+        if (!$product) {
+            return redirect()->route('stocks.overview')->with('error', 'Product niet gevonden.');
+        }
+
+        $stockInfo = $this->productStockService->getProductStockInfo($id);
+        $categories = $this->productStockService->getActiveCategories();
+
+        return view('stocks.product-edit', compact('product', 'stockInfo', 'categories'));
+    }
+
+    /**
+     * Update product delivered quantity
+     */
+    public function updateProduct(Request $request, $id): RedirectResponse
+    {
+        $request->validate([
+            'delivered_quantity' => 'required|integer|min:0',
+            'delivery_date' => 'nullable|date'
+        ]);
+
+        $result = $this->productStockService->updateDeliveredQuantity(
+            $id,
+            $request->delivered_quantity,
+            $request->delivery_date
+        );
+
+        if ($result['success']) {
+            return redirect()->route('stocks.product.show', $id)
+                           ->with('success', 'De productgegevens zijn gewijzigd');
+        } else {
+            if ($result['result'] === 'INSUFFICIENT_STOCK') {
+                return redirect()->back()
+                               ->with('error', 'Er worden meer producten uitgeleverd dan er in voorraad zijn')
+                               ->withInput();
+            } else {
+                return redirect()->back()
+                               ->with('error', 'Er is een fout opgetreden bij het bijwerken.')
+                               ->withInput();
+            }
+        }
+    }
+
+    /**
+     * Show warehouse details for editing
+     */
+    public function showWarehouse($id)
+    {
+        $warehouse = $this->productStockService->getWarehouseDetails($id);
+
+        if (!$warehouse) {
+            return redirect()->route('stocks.overview')->with('error', 'Magazijn niet gevonden.');
+        }
+
+        return view('stocks.warehouse-details', compact('warehouse'));
+    }
+
+    /**
+     * Update warehouse details
+     */
+    public function updateWarehouse(Request $request, $id): RedirectResponse
+    {
+        $request->validate([
+            'received_date' => 'required|date',
+            'delivery_date' => 'nullable|date',
+            'package_unit' => 'required|string|max:255',
+            'quantity' => 'required|integer|min:0',
+            'note' => 'nullable|string',
+            'is_active' => 'boolean'
+        ]);
+
+        $data = $request->all();
+        $data['is_active'] = $request->has('is_active');
+
+        $success = $this->productStockService->updateWarehouse($id, $data);
+
+        if ($success) {
+            return redirect()->route('stocks.warehouse.show', $id)
+                           ->with('success', 'Magazijn succesvol bijgewerkt!');
+        } else {
+            return redirect()->back()
+                           ->with('error', 'Er is een fout opgetreden bij het bijwerken van het magazijn.')
+                           ->withInput();
+        }
     }
 }
