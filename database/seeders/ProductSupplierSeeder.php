@@ -15,7 +15,7 @@ class ProductSupplierSeeder extends Seeder
             ['id'=>3,  'supplier_id'=>2, 'product_id'=>3,  'delivered_at'=>'2024-07-16', 'next_delivery_at'=>'2024-08-16', 'created_at'=>now(), 'updated_at'=>now()],
             ['id'=>4,  'supplier_id'=>1, 'product_id'=>4,  'delivered_at'=>'2024-02-12', 'next_delivery_at'=>'2024-03-12', 'created_at'=>now(), 'updated_at'=>now()],
             ['id'=>5,  'supplier_id'=>4, 'product_id'=>5,  'delivered_at'=>'2024-05-19', 'next_delivery_at'=>'2024-06-19', 'created_at'=>now(), 'updated_at'=>now()],
-            ['id'=>6,  'supplier_id'=>4, 'product_id'=>6,  'delivered_at'=>'2024-06-23', 'next_delivery_at'=>'2024-07-23', 'created_at'=>now(), 'updated_at'=>now()],
+            ['id'=>6,  'supplier_id'=>1, 'product_id'=>6,  'delivered_at'=>'2024-06-23', 'next_delivery_at'=>'2024-07-23', 'created_at'=>now(), 'updated_at'=>now()],
             ['id'=>7,  'supplier_id'=>4, 'product_id'=>7,  'delivered_at'=>'2024-06-20', 'next_delivery_at'=>'2024-07-20', 'created_at'=>now(), 'updated_at'=>now()],
             ['id'=>8,  'supplier_id'=>4, 'product_id'=>8,  'delivered_at'=>'2024-05-02', 'next_delivery_at'=>'2024-06-02', 'created_at'=>now(), 'updated_at'=>now()],
             ['id'=>9,  'supplier_id'=>4, 'product_id'=>9,  'delivered_at'=>'2022-12-04', 'next_delivery_at'=>'2024-01-04', 'created_at'=>now(), 'updated_at'=>now()],
