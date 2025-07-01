@@ -8,7 +8,7 @@
 
     @if($disabled)
         <div class="alert alert-warning">
-            Dit gezin is niet meer ingeschreven bij de voedselbank en daarom kan er geen voedselpakket worden uitgereikt
+            Dit gezin is niet meer ingeschreven bij de voedselbank en daarom kan er geen voedselpakket worden Uitgereikt
         </div>
     @endif
 
