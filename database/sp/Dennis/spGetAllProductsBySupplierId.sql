@@ -3,6 +3,7 @@ DELIMITER $$
 CREATE PROCEDURE spGetAllProductsBySupplierId(IN in_supplier_id INT)
 BEGIN
     SELECT
+        p.id,
         p.name,
         p.allergy_type,
         p.barcode,

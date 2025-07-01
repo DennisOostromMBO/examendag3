@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SupplierController extends Controller
@@ -53,5 +54,35 @@ class SupplierController extends Controller
             Log::error('Fout bij ophalen producten van leverancier: ' . $e->getMessage());
             return back()->with('error', 'Er is een fout opgetreden bij het ophalen van de producten.');
         }
+    }
+
+    /**
+     * Toon het formulier om de houdbaarheidsdatum van een product te wijzigen.
+     */
+    public function editProductExpiration($productId, Request $request)
+    {
+        $product = DB::table('products')->where('id', $productId)->first();
+        $supplierId = $request->get('supplier_id');
+        // Gebruik de juiste view in de suppliers map
+        return view('suppliers.edit', compact('product', 'supplierId'));
+    }
+
+    /**
+     * Werk de houdbaarheidsdatum van een product bij via stored procedure.
+     */
+    public function updateProductExpiration(Request $request, $productId)
+    {
+        $request->validate([
+            'expiration_date' => 'required|date',
+            'supplier_id' => 'required|integer'
+        ]);
+
+        DB::statement('CALL spUpdateProducts(?, ?)', [
+            $productId,
+            $request->input('expiration_date')
+        ]);
+
+        return redirect()->route('suppliers.products', $request->input('supplier_id'))
+            ->with('success', 'Houdbaarheidsdatum succesvol bijgewerkt.');
     }
 }

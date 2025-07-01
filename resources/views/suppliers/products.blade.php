@@ -45,13 +45,13 @@
                         <td class="px-4 py-2">{{ $product->allergy_type ?? '~~~' }}</td>
                         <td class="px-4 py-2">{{ $product->barcode ?? '~~~' }}</td>
                         <td class="px-4 py-2">{{ $product->expiration_date ?? '~~~' }}</td>
-                        <td class="px-4 py-2 text-center">
-                            <a href="#" class="text-blue-600 hover:text-blue-800">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13h6m2 2a2 2 0 11-4 0 2 2 0 014 0zm-2-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2h6a2 2 0 002-2z" />
-                                </svg>
-                            </a>
-                        </td>
+                       <td class="px-4 py-2 text-center">
+    <a href="{{ route('products.edit', ['product' => $product->id, 'supplier_id' => $supplier->id]) }}" class="text-blue-600 hover:text-blue-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13h6m2 2a2 2 0 11-4 0 2 2 0 014 0zm-2-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2h6a2 2 0 002-2z" />
+        </svg>
+    </a>
+</td>
                     </tr>
                 @empty
                     <tr>
