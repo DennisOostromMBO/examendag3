@@ -31,18 +31,6 @@
     </div>
     <div class="row">
         <div class="col-12">
-            {{-- Debug output --}}
-            <div>
-                <strong>Count:</strong> {{ count($families) }}
-                @if(count($families))
-                    <pre>{{ print_r($families[0], true) }}</pre>
-                @endif
-            </div>
-            @if(config('app.debug'))
-                <pre style="background:#f8f9fa; color:#333; border:1px solid #ccc; padding:10px;">
-families: {{ var_export($families, true) }}
-                </pre>
-            @endif
             <table class="table table-bordered align-middle">
                 <thead class="table-light">
                     <tr>
@@ -79,6 +67,10 @@ families: {{ var_export($families, true) }}
                     @endforelse
                 </tbody>
             </table>
+            {{-- Pagination links --}}
+            <div class="d-flex justify-content-center">
+                {{ $families->links() }}
+            </div>
         </div>
     </div>
     <div class="row mt-3">
