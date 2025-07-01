@@ -3,6 +3,8 @@
 @section('title', 'Voedselpakketten - Voedselbank Maaskantje')
 
 @section('content')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
 <div class="container mt-4">
     <div class="row mb-3">
         <div class="col-12">
@@ -68,7 +70,7 @@
                             <td>
                                 @if(!empty($parcel->Pakketnummer))
                                     <a href="{{ route('food-packages.show', $parcel->Pakketnummer) }}" class="btn btn-sm btn-info">
-                                        Details
+                                        <i class="bi bi-box"></i>
                                     </a>
                                 @else
                                     <span class="text-muted">Geen pakket</span>

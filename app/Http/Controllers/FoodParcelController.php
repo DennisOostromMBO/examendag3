@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\FoodParcel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class FoodParcelController extends Controller
 {
@@ -48,5 +50,51 @@ class FoodParcelController extends Controller
             ->values();
 
         return view('food-packages.Show', compact('parcel', 'pakketten'));
+    }
+
+    public function edit($pakketnummer)
+    {
+        $parcels = DB::select('CALL Get_all_FoodParcels()');
+        $pakket = collect($parcels)->firstWhere('Pakketnummer', $pakketnummer);
+        if (!$pakket) {
+            abort(404);
+        }
+        // Only allow these statuses
+        $statusOptions = [
+            'Niet Uitgereikt',
+            'NietMeerIngeschreven',
+            'Uitgereikt'
+        ];
+        return view('food-packages.edit', compact('pakket', 'statusOptions'));
+    }
+
+    public function update(Request $request, $pakketnummer)
+    {
+        $request->validate([
+            'Status' => 'required|string|max:50',
+        ]);
+
+        $status = $request->input('Status');
+        $parcels = DB::select('CALL Get_all_FoodParcels()');
+        $pakket = collect($parcels)->firstWhere('Pakketnummer', $pakketnummer);
+        if (!$pakket) {
+            abort(404);
+        }
+
+        $datumUitgifte = null;
+        if ($status === 'Uitgereikt') {
+            $datumUitgifte = Carbon::now()->toDateString();
+        }
+
+        // Find the foodparcel id by pakketnummer
+        $foodparcelId = DB::table('foodparcels')->where('parcel_number', $pakketnummer)->value('id');
+
+        DB::statement('CALL Update_Food_Parcel_Status_And_IssueDate(?, ?, ?)', [
+            $foodparcelId,
+            $status,
+            $datumUitgifte
+        ]);
+
+        return redirect()->route('food-packages.show', $pakketnummer)->with('success', 'Status bijgewerkt.');
     }
 }

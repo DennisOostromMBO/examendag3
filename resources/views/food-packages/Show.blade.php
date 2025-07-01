@@ -3,6 +3,7 @@
 @section('title', 'Voedselpakket Details')
 
 @section('content')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 <div class="container mt-4">
     <h4>
         <a href="{{ route('food-packages.index') }}" class="text-success text-decoration-none">
@@ -45,12 +46,7 @@
                     <td>{{ $pakket->Status }}</td>
                     <td>{{ $pakket->AantalProducten }}</td>
                     <td class="text-center">
-                    
-                      
-                    
-                    {{-- 
-                       <a href="{{ route('food-packages.edit', $pakket->id) }}">
-                        --}}
+                        <a href="{{ route('food-packages.edit', $pakket->Pakketnummer) }}">
                             <i class="bi bi-pencil-square"></i>
                         </a>
                     </td> 
