@@ -9,21 +9,25 @@
     <div class="flex justify-end mb-6">
         <a href="{{ route('home') }}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">Home</a>
     </div>
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <div>
-            <h2 class="text-2xl font-bold text-green-700 underline mb-1">Overzicht Leveranciers</h2>
-            <p class="text-gray-500 text-sm">
-                <a href="{{ route('home') }}" class="hover:underline">Homepage voedselbank maaskantje</a>
-            </p>
+    <form method="get" action="{{ route('suppliers.index') }}">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-green-700 underline mb-1">Overzicht Leveranciers</h2>
+                <p class="text-gray-500 text-sm">
+                    <a href="{{ route('home') }}" class="hover:underline">Homepage voedselbank maaskantje</a>
+                </p>
+            </div>
+            <div class="flex items-center gap-2 mt-4 md:mt-0">
+                <select name="supplier_type" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 min-w-[220px]">
+                    <option value="">Selecteer Leveranciertype</option>
+                    @foreach($types as $type)
+                        <option value="{{ $type }}" @if($selectedType == $type) selected @endif>{{ $type }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition min-w-[180px]">Toon Leveranciers</button>
+            </div>
         </div>
-        <div class="flex items-center gap-2 mt-4 md:mt-0">
-            <select class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 min-w-[220px]">
-                <option selected>Selecteer Leveranciertype</option>
-                {{-- Opties dynamisch toevoegen indien nodig --}}
-            </select>
-            <button type="button" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition min-w-[180px]">Toon Leveranciers</button>
-        </div>
-    </div>
+    </form>
     <div class="overflow-x-auto bg-white rounded shadow">
         <table class="min-w-full divide-y divide-gray-200 table-fixed">
             <thead class="bg-gray-100">
@@ -56,7 +60,9 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-4 py-4 text-center text-gray-500">Geen leveranciers gevonden.</td>
+                        <td colspan="7" class="px-4 py-4 text-center bg-yellow-100 text-yellow-800 rounded">
+                            Er zijn geen leveranciers bekend van het geselecteerde leverancierstype
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
