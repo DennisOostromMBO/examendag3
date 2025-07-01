@@ -4,12 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Stock;
 use App\Models\Supplier;
+use App\Services\ProductStockService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class StockController extends Controller
 {
+    protected $productStockService;
+
+    public function __construct(ProductStockService $productStockService)
+    {
+        $this->productStockService = $productStockService;
+    }
+
     /**
      * Display the stock overview page (Overzicht Productvoorraden)
      */
@@ -17,10 +25,9 @@ class StockController extends Controller
     {
         $categoryFilter = $request->get('category');
 
-        // Placeholder: In real implementation, this would fetch from database
-        // For now, we'll use placeholder data to show the UI structure
-        $stocks = $this->getPlaceholderStockData($categoryFilter);
-        $categories = $this->getPlaceholderCategories();
+        // Use stored procedures to get data
+        $stocks = $this->productStockService->getStockOverview($categoryFilter);
+        $categories = $this->productStockService->getActiveCategories();
 
         return view('stocks.index', compact('stocks', 'categories', 'categoryFilter'));
     }
@@ -112,5 +119,85 @@ class StockController extends Controller
             'SKGC' => 'Snoep, Koek, Gebak en Chocolade',
             'BVH' => 'Baby Voeding en Hygiëne'
         ];
+    }
+
+    /**
+     * Show product details for editing
+     */
+    public function showProduct(Request $request, $id): View
+    {
+        $product = $this->productStockService->getProductDetails($id);
+        $categories = $this->productStockService->getActiveCategories();
+        
+        if (!$product) {
+            abort(404, 'Product niet gevonden');
+        }
+
+        return view('stocks.product-details', compact('product', 'categories'));
+    }
+
+    /**
+     * Update product using stored procedure
+     */
+    public function updateProduct(Request $request, $id): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|integer|exists:categories,id',
+            'allergy_type' => 'nullable|string|max:255',
+            'barcode' => 'required|string|max:255',
+            'expiration_date' => 'required|date',
+            'description' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
+            'is_active' => 'boolean',
+            'note' => 'nullable|string'
+        ]);
+
+        $success = $this->productStockService->updateProduct($id, $validated);
+
+        if ($success) {
+            return redirect()->route('stocks.overview')
+                ->with('success', 'Product succesvol bijgewerkt');
+        } else {
+            return back()->with('error', 'Er is een fout opgetreden bij het bijwerken van het product');
+        }
+    }
+
+    /**
+     * Show warehouse details for editing
+     */
+    public function showWarehouse(Request $request, $id): View
+    {
+        $warehouse = $this->productStockService->getWarehouseDetails($id);
+        
+        if (!$warehouse) {
+            abort(404, 'Magazijn niet gevonden');
+        }
+
+        return view('stocks.warehouse-details', compact('warehouse'));
+    }
+
+    /**
+     * Update warehouse using stored procedure
+     */
+    public function updateWarehouse(Request $request, $id): RedirectResponse
+    {
+        $validated = $request->validate([
+            'received_date' => 'required|date',
+            'delivery_date' => 'nullable|date',
+            'package_unit' => 'required|string|max:255',
+            'quantity' => 'required|integer|min:0',
+            'is_active' => 'boolean',
+            'note' => 'nullable|string'
+        ]);
+
+        $success = $this->productStockService->updateWarehouse($id, $validated);
+
+        if ($success) {
+            return redirect()->route('stocks.overview')
+                ->with('success', 'Magazijn succesvol bijgewerkt');
+        } else {
+            return back()->with('error', 'Er is een fout opgetreden bij het bijwerken van het magazijn');
+        }
     }
 }

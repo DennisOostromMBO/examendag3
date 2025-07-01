@@ -44,14 +44,18 @@
                 <tbody>
                     @foreach($stocks as $stock)
                         <tr>
-                            <td>{{ $stock['item_name'] ?? '~' }}</td>
+                            <td>
+                                <a href="{{ route('stocks.product.show', $stock['product_id']) }}" class="text-decoration-none">
+                                    {{ $stock['item_name'] ?? '~' }}
+                                </a>
+                            </td>
                             <td>{{ $stock['category'] ?? '~' }}</td>
                             <td>{{ $stock['unit'] ?? '~' }}</td>
                             <td>{{ $stock['quantity'] ?? '~' }}</td>
                             <td>{{ $stock['expiry_date'] ?? '~' }}</td>
                             <td>{{ $stock['supplier'] ?? '~' }}</td>
                             <td class="text-center">
-                                <a href="#" class="text-decoration-none">📋</a>
+                                <a href="{{ route('stocks.product.show', $stock['product_id']) }}" class="text-decoration-none">📋</a>
                             </td>
                         </tr>
                     @endforeach
