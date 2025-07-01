@@ -20,6 +20,12 @@ class FoodParcelController extends Controller
             });
         }
 
+        // Remove duplicate families by Gezinsnaam (keep the first occurrence)
+        $foodParcels = collect($foodParcels)
+            ->unique('Gezinsnaam')
+            ->values()
+            ->all();
+
         return view('food-packages.index', compact('foodParcels', 'eetwens'));
     }
 
@@ -31,7 +37,7 @@ class FoodParcelController extends Controller
             abort(404);
         }
 
-        // Build pakketten array for this family
+        // Build pakketten array for this family, remove duplicates by Pakketnummer
         $pakketten = collect($parcels)
             ->where('Gezinsnaam', $parcel->Gezinsnaam)
             ->map(function($p) {
@@ -47,6 +53,7 @@ class FoodParcelController extends Controller
             ->filter(function($p) {
                 return !empty($p->Pakketnummer);
             })
+            ->unique('Pakketnummer')
             ->values();
 
         return view('food-packages.Show', compact('parcel', 'pakketten'));
