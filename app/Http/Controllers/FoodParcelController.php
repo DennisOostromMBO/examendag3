@@ -13,11 +13,15 @@ class FoodParcelController extends Controller
     {
         $eetwens = $request->input('eetwens');
         $foodParcels = \DB::select('CALL Get_all_FoodParcels()');
-
-        if ($eetwens && $eetwens !== 'all') {
+        try {
+            if ($eetwens && $eetwens !== 'all') {
             $foodParcels = array_filter($foodParcels, function($parcel) use ($eetwens) {
                 return isset($parcel->Eetwens) && $parcel->Eetwens === $eetwens;
             });
+            }
+        } catch (\Exception $e) {
+            // Log the error or handle it as needed
+            return back()->withErrors(['msg' => 'Er is een fout opgetreden bij het filteren van de voedselpakketten.']);
         }
 
         // Remove duplicate families by Gezinsnaam (keep the first occurrence)
