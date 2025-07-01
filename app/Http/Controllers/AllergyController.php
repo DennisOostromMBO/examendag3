@@ -54,7 +54,17 @@ class AllergyController extends Controller
         $currentAllergyId = DB::table('allergy_person')->where('person_id', $personId)->pluck('allergy_id')->first();
         $currentAllergy = $allergies->firstWhere('id', $currentAllergyId);
 
-        // No more separate warning view, always show edit page
+        // Show warning if the current allergy is "Pinda's" and not confirmed
+        if ($currentAllergy && strtolower($currentAllergy->name) === "pinda's" && !request()->has('confirm')) {
+            return view('allergies.edit_person_allergy', [
+                'person' => $person,
+                'allergies' => $allergies,
+                'currentAllergyId' => $currentAllergyId,
+                'show_pinda_warning' => true,
+                'selected_allergy_id' => old('allergy_id', $currentAllergyId),
+            ]);
+        }
+
         return view('allergies.edit_person_allergy', compact('person', 'allergies', 'currentAllergyId'));
     }
 
@@ -65,31 +75,30 @@ class AllergyController extends Controller
             'allergy_id' => 'required|exists:allergies,id',
         ]);
 
-        $selectedAllergy = \App\Models\Allergy::find($request->allergy_id);
+        $allergies = \App\Models\Allergy::all();
+        $currentAllergyId = DB::table('allergy_person')->where('person_id', $personId)->pluck('allergy_id')->first();
+        $currentAllergy = $allergies->firstWhere('id', $currentAllergyId);
 
-        // If selected allergy is "Pinda's" and not confirmed, show warning before updating
-        if ($selectedAllergy && strtolower($selectedAllergy->name) === "pinda's" && !$request->has('confirm')) {
-            // Show warning, keep selected allergy in the form
-            return back()
+        // If current allergy is "Pinda's" and not confirmed, show warning before updating
+        if ($currentAllergy && strtolower($currentAllergy->name) === "pinda's" && !$request->has('confirm')) {
+            return redirect()
+                ->route('allergies.person.edit', ['personId' => $personId, 'confirm' => 1])
                 ->withInput()
                 ->with([
                     'show_pinda_warning' => true,
-                    'selected_allergy_id' => $selectedAllergy->id,
+                    'selected_allergy_id' => $request->allergy_id,
                 ]);
         }
 
         try {
-            // Use stored procedure via model
             \App\Models\Allergy::updatePersonAllergySP($personId, $request->allergy_id);
 
-            // Redirect back to the edit page with success message and delay
             return redirect()
                 ->route('allergies.person.edit', ['personId' => $personId])
                 ->with('success', 'De wijziging is doorgevoerd')
                 ->with('delay', 3)
                 ->with('familyId', \App\Models\Person::find($personId)->family_id);
         } catch (\Exception $e) {
-            // Redirect back with error message
             return redirect()
                 ->route('allergies.person.edit', ['personId' => $personId])
                 ->with('error', 'Er is een fout opgetreden bij het opslaan: ' . $e->getMessage());
