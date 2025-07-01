@@ -77,12 +77,19 @@ class SupplierController extends Controller
             'supplier_id' => 'required|integer'
         ]);
 
+        $current = DB::table('products')->where('id', $productId)->value('expiration_date');
+        $new = $request->input('expiration_date');
+
+        // Alleen deze error als je verder dan 7 dagen invult
+        if ($current && \Carbon\Carbon::parse($new)->gt(\Carbon\Carbon::parse($current)->addDays(7))) {
+            return redirect()->back()->with('error', true);
+        }
+
         DB::statement('CALL spUpdateProducts(?, ?)', [
             $productId,
-            $request->input('expiration_date')
+            $new
         ]);
 
-        return redirect()->route('suppliers.products', $request->input('supplier_id'))
-            ->with('success', 'Houdbaarheidsdatum succesvol bijgewerkt.');
+        return redirect()->back()->with('success', 'Houdbaarheidsdatum succesvol bijgewerkt.');
     }
 }
