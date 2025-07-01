@@ -13,6 +13,13 @@
     @if(session('success'))
         <div class="mb-4 px-4 py-2 bg-green-100 border border-green-400 text-green-700 rounded">
             {{ session('success') }}
+            @if(session('delay') && session('familyId'))
+                <script>
+                    setTimeout(function() {
+                        window.location.href = "{{ route('allergies.family', ['familyId' => session('familyId')]) }}";
+                    }, {{ session('delay') * 1000 }});
+                </script>
+            @endif
         </div>
     @endif
     <form method="POST" action="{{ route('allergies.person.update', ['personId' => $person->id]) }}">

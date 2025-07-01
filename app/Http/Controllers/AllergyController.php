@@ -82,10 +82,12 @@ class AllergyController extends Controller
             // Use stored procedure via model
             \App\Models\Allergy::updatePersonAllergySP($personId, $request->allergy_id);
 
-            // Redirect back to the edit page with success message
+            // Redirect back to the edit page with success message and delay
             return redirect()
                 ->route('allergies.person.edit', ['personId' => $personId])
-                ->with('success', 'De wijziging is doorgevoerd');
+                ->with('success', 'De wijziging is doorgevoerd')
+                ->with('delay', 3)
+                ->with('familyId', \App\Models\Person::find($personId)->family_id);
         } catch (\Exception $e) {
             // Redirect back with error message
             return redirect()
