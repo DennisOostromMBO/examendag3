@@ -80,8 +80,8 @@ class AllergyController extends Controller
         // If selected allergy is "Pinda's" and not confirmed, show warning before updating
         if ($selectedAllergy && strtolower($selectedAllergy->name) === "pinda's" && !$request->has('confirm')) {
             // Show warning, keep selected allergy in the form
-            return redirect()
-                ->route('allergies.person.edit', ['personId' => $personId])
+            return back()
+                ->withInput()
                 ->with([
                     'show_pinda_warning' => true,
                     'selected_allergy_id' => $selectedAllergy->id,
@@ -91,11 +91,10 @@ class AllergyController extends Controller
         // Use stored procedure via model
         \App\Models\Allergy::updatePersonAllergySP($personId, $request->allergy_id);
 
-        // Feedback and redirect after 3 seconds
+        // Redirect back to the edit page with success message
         return redirect()
-            ->route('allergies.family', ['familyId' => \App\Models\Person::find($personId)->family_id])
-            ->with('success', 'De wijziging is doorgevoerd')
-            ->with('delay', 3);
+            ->route('allergies.person.edit', ['personId' => $personId])
+            ->with('success', 'De wijziging is doorgevoerd');
     }
 }
 

@@ -10,6 +10,11 @@
             Voor het wijzigen van deze allergie wordt geadviseerd eerst een arts te raadplegen vanwege een hoog risico op een anafylactisch shock
         </div>
     @endif
+    @if(session('success'))
+        <div class="mb-4 px-4 py-2 bg-green-100 border border-green-400 text-green-700 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
     <form method="POST" action="{{ route('allergies.person.update', ['personId' => $person->id]) }}">
         @csrf
         @if(session('show_pinda_warning'))
@@ -41,6 +46,14 @@
             </div>
         </div>
     </form>
+    @if(session('show_pinda_warning'))
+        <script>
+            // Prevent redirect after submit, stay on this page to show the warning
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        </script>
+    @endif
 </div>
 @endsection
 
