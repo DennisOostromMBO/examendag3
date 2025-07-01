@@ -70,9 +70,12 @@
                     </td>
                     <td class="px-4 py-2 border-b text-center">
                         <a href="{{ route('allergies.person.edit', ['personId' => $person->id]) }}" title="Wijzig Allergie" class="inline-block text-blue-600 hover:text-blue-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2h6" />
-                            </svg>
+                            <span class="inline-flex items-center">
+                                {{-- Bigger pencil icon --}}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-6 w-6 -ml-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2h6" />
+                                </svg>
+                            </span>
                         </a>
                     </td>
                 </tr>

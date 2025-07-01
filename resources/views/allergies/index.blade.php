@@ -49,14 +49,9 @@
                         <td class="px-4 py-2 border-b text-center">{{ $family->babys }}</td>
                         <td class="px-4 py-2 border-b">{{ $family->vertegenwoordiger }}</td>
                         <td class="px-4 py-2 border-b text-center">
-                            <a href="{{ route('allergies.family', ['familyId' => $family->familie_id]) }}" title="Details" aria-label="Details" class="inline-block text-blue-600 hover:text-blue-800">
+                            <a href="{{ route('allergies.family', ['familyId' => $family->familie_id]) }}" title="Allergie Details" aria-label="Allergie Details" class="inline-block text-blue-600 hover:text-blue-800">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z" />
-                                </svg>
-                            </a>
-                            <a href="{{ route('allergies.family', ['familyId' => $family->familie_id]) }}" title="Wijzig Allergieën" aria-label="Wijzig Allergieën" class="inline-block text-yellow-600 hover:text-yellow-800 ml-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2h6" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19V6a2 2 0 012-2h6a2 2 0 012 2v13M3 19a2 2 0 002 2h6a2 2 0 002-2M21 19V6a2 2 0 00-2-2h-6a2 2 0 00-2 2v13m10 0a2 2 0 01-2 2h-6a2 2 0 01-2-2" />
                                 </svg>
                             </a>
                         </td>
@@ -87,5 +82,6 @@
     </div>
 </div>
 @endsection
+    
 
 
