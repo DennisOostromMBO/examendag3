@@ -17,7 +17,12 @@
                 @endforeach
             </select>
         </div>
-        <button type="submit" class="btn btn-success">Wijzig Allergie</button>
+        <button type="submit" class="btn btn-success">
+            <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2h6" />
+            </svg>
+            Wijzig Allergie
+        </button>
         <a href="{{ url()->previous() }}" class="btn btn-secondary">Annuleer</a>
     </form>
 </div>
