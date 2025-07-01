@@ -5,32 +5,8 @@
 @section('content')
 <div class="max-w-lg mx-auto mt-10 shadow p-6 bg-white rounded">
     <h2 class="text-green-700 font-bold underline text-xl mb-6">Wijzig allergie</h2>
-    {{-- Success message --}}
-    @if(session('success'))
-        <div class="mb-4 px-4 py-2 bg-green-100 border border-green-400 text-green-700 rounded">
-            {{ session('success') }}
-            @if(session('delay') && session('familyId'))
-                <script>
-                    setTimeout(function() {
-                        window.location.href = "{{ route('allergies.family', ['familyId' => session('familyId')]) }}";
-                    }, {{ session('delay') * 1000 }});
-                </script>
-            @endif
-        </div>
-    @endif
-
-    {{-- Error message --}}
-    @if(session('error'))
-        <div class="mb-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
-            {{ session('error') }}
-        </div>
-    @endif
-
     {{-- Pinda warning and confirmation --}}
     @if(isset($show_pinda_warning) && $show_pinda_warning)
-        <div class="mb-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
-            Voor het wijzigen van deze allergie wordt geadviseerd eerst een arts te raadplegen vanwege een hoog risico op een anafylactisch shock
-        </div>
         <form method="POST" action="{{ route('allergies.person.update', ['personId' => $person->id]) }}">
             @csrf
             <input type="hidden" name="confirm" value="1">
@@ -43,6 +19,29 @@
                         </option>
                     @endforeach
                 </select>
+                {{-- Pinda warning below dropdown --}}
+                <div class="mt-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                    Voor het wijzigen van deze allergie wordt geadviseerd eerst een arts te raadplegen vanwege een hoog risico op een anafylactisch shock
+                </div>
+                {{-- Success message --}}
+                @if(session('success'))
+                    <div class="mt-4 px-4 py-2 bg-green-100 border border-green-400 text-green-700 rounded">
+                        {{ session('success') }}
+                        @if(session('delay') && session('familyId'))
+                            <script>
+                                setTimeout(function() {
+                                    window.location.href = "{{ route('allergies.family', ['familyId' => session('familyId')]) }}";
+                                }, {{ session('delay') * 1000 }});
+                            </script>
+                        @endif
+                    </div>
+                @endif
+                {{-- Error message --}}
+                @if(session('error'))
+                    <div class="mt-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {{ session('error') }}
+                    </div>
+                @endif
             </div>
             <div class="flex justify-between">
                 <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">
@@ -66,6 +65,25 @@
                         </option>
                     @endforeach
                 </select>
+                {{-- Success message --}}
+                @if(session('success'))
+                    <div class="mt-4 px-4 py-2 bg-green-100 border border-green-400 text-green-700 rounded">
+                        {{ session('success') }}
+                        @if(session('delay') && session('familyId'))
+                            <script>
+                                setTimeout(function() {
+                                    window.location.href = "{{ route('allergies.family', ['familyId' => session('familyId')]) }}";
+                                }, {{ session('delay') * 1000 }});
+                            </script>
+                        @endif
+                    </div>
+                @endif
+                {{-- Error message --}}
+                @if(session('error'))
+                    <div class="mt-4 px-4 py-2 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {{ session('error') }}
+                    </div>
+                @endif
             </div>
             <div class="flex justify-between">
                 <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">
