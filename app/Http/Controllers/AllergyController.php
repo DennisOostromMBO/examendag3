@@ -78,17 +78,24 @@ class AllergyController extends Controller
                 ]);
         }
 
-        // Use stored procedure via model
-        \App\Models\Allergy::updatePersonAllergySP($personId, $request->allergy_id);
+        try {
+            // Use stored procedure via model
+            \App\Models\Allergy::updatePersonAllergySP($personId, $request->allergy_id);
 
-        // Redirect back to the edit page with success message
-        return redirect()
-            ->route('allergies.person.edit', ['personId' => $personId])
-            ->with('success', 'De wijziging is doorgevoerd');
+            // Redirect back to the edit page with success message
+            return redirect()
+                ->route('allergies.person.edit', ['personId' => $personId])
+                ->with('success', 'De wijziging is doorgevoerd');
+        } catch (\Exception $e) {
+            // Redirect back with error message
+            return redirect()
+                ->route('allergies.person.edit', ['personId' => $personId])
+                ->with('error', 'Er is een fout opgetreden bij het opslaan: ' . $e->getMessage());
+        }
     }
 }
 
-    
+
 
 
 
