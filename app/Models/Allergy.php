@@ -33,4 +33,16 @@ class Allergy extends Model
             ['path' => LengthAwarePaginator::resolveCurrentPath()]
         );
     }
+
+    /**
+     * Update a person's allergy using the stored procedure.
+     *
+     * @param int $personId
+     * @param int $allergyId
+     * @return void
+     */
+    public static function updatePersonAllergySP($personId, $allergyId)
+    {
+        DB::statement('CALL sp_update_person_allergy(?, ?)', [$personId, $allergyId]);
+    }
 }

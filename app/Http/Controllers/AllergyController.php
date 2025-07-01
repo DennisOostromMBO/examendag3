@@ -63,20 +63,17 @@ class AllergyController extends Controller
             'allergy_id' => 'required|exists:allergies,id',
         ]);
 
-        // Remove old allergy and add new one (assuming one allergy per person)
-        DB::table('allergy_person')->where('person_id', $personId)->delete();
-        DB::table('allergy_person')->insert([
-            'person_id' => $personId,
-            'allergy_id' => $request->allergy_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // Use stored procedure via model
+        \App\Models\Allergy::updatePersonAllergySP($personId, $request->allergy_id);
 
         // Feedback and redirect after 3 seconds
         return redirect()
-            ->route('allergies.family', ['familyId' => Person::find($personId)->family_id])
+            ->route('allergies.family', ['familyId' => \App\Models\Person::find($personId)->family_id])
             ->with('success', 'De wijziging is doorgevoerd')
             ->with('delay', 3);
     }
 }
+      
+    
+
 
