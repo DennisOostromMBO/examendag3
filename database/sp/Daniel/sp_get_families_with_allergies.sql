@@ -5,21 +5,22 @@
 CREATE PROCEDURE sp_get_families_with_allergies(IN allergy_id INT)
 BEGIN
     SELECT 
-        f.Naam AS familie_naam,
-        f.Omschrijving AS familie_omschrijving,
-        (SELECT COUNT(*) FROM persons p WHERE p.family_id = f.Id AND p.type = 'volwassene') AS volwassenen,
-        (SELECT COUNT(*) FROM persons p WHERE p.family_id = f.Id AND p.type = 'kind') AS kinderen,
-        (SELECT COUNT(*) FROM persons p WHERE p.family_id = f.Id AND p.type = 'baby') AS babys,
-        v.Naam AS vertegenwoordiger,
-        a.Naam AS allergie_naam,
-        a.Omschrijving AS allergie_omschrijving
+        f.name AS familie_naam,
+        f.description AS familie_omschrijving,
+        f.adults AS volwassenen,
+        f.children AS kinderen,
+        f.babies AS babys,
+        -- Get representative's full name (first person with is_representative = 1 in this family)
+        (SELECT CONCAT(p.first_name, ' ', IFNULL(p.insertion, ''), ' ', p.last_name)
+         FROM persons p
+         WHERE p.family_id = f.id AND p.is_representative = 1
+         LIMIT 1) AS vertegenwoordiger,
+        a.name AS allergie_naam,
+        a.description AS allergie_omschrijving
     FROM families f
-    JOIN contact_family cf ON cf.family_id = f.Id
-    JOIN persons v ON v.Id = f.vertegenwoordiger_id
-    JOIN foodwishes fw ON fw.family_id = f.Id
-    JOIN allergies a ON a.Id = fw.allergy_id
-    WHERE (allergy_id IS NULL OR a.Id = allergy_id)
-    GROUP BY f.Id, a.Id;
-END 
+    CROSS JOIN allergies a
+    WHERE (allergy_id IS NULL OR a.id = allergy_id)
+    ORDER BY f.name, a.name;
+END
 
 
