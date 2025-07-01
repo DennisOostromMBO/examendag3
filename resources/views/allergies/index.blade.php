@@ -8,82 +8,84 @@
     $families = $families ?? collect();
     $selectedAllergy = $selectedAllergy ?? '';
 @endphp
-<div class="container mt-4">
-    <div class="row mb-2">
-        <div class="col-12">
-            <a href="#" class="fw-bold text-success" style="text-decoration: underline; font-size: 1.2rem;">Overzicht gezinnen met allergieën</a>
-        </div>
+<div class="max-w-6xl mx-auto mt-8">
+    <div class="mb-4">
+        <a href="#" class="font-bold text-green-600 underline text-xl">Overzicht gezinnen met allergieën</a>
     </div>
-    <div class="row mb-3">
-        <div class="col-12 d-flex justify-content-end align-items-center">
-            <form method="GET" class="d-flex">
-                <select name="allergy_id" class="form-select w-auto me-2" aria-label="Selecteer Allergie">
-                    <option value="">Selecteer Allergie</option>
-                    @foreach($allergies as $allergy)
-                        <option value="{{ $allergy->id }}" {{ ($selectedAllergy == $allergy->id) ? 'selected' : '' }}>
-                            {{ $allergy->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <button type="submit" class="btn btn-dark">Toon Gezinnen</button>
-            </form>
-        </div>
+    <div class="mb-6 flex justify-end items-center">
+        <form method="GET" class="flex space-x-2">
+            <select name="allergy_id" class="block w-auto px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300" aria-label="Selecteer Allergie">
+                <option value="">Selecteer Allergie</option>
+                @foreach($allergies as $allergy)
+                    <option value="{{ $allergy->id }}" {{ ($selectedAllergy == $allergy->id) ? 'selected' : '' }}>
+                        {{ $allergy->name }}
+                    </option>
+                @endforeach
+            </select>
+            <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition">Toon Gezinnen</button>
+        </form>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <table class="table table-bordered align-middle">
-                <thead class="table-light">
+    <div>
+        <div class="overflow-x-auto rounded shadow">
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead class="bg-gray-100">
                     <tr>
-                        <th>Naam</th>
-                        <th>Omschrijving</th>
-                        <th>Volwassenen</th>
-                        <th>Kinderen</th>
-                        <th>Babys</th>
-                        <th>Vertegenwoordiger</th>
-                        <th>Allergie Details</th>
+                        <th class="px-4 py-2 border-b">Naam</th>
+                        <th class="px-4 py-2 border-b">Omschrijving</th>
+                        <th class="px-4 py-2 border-b">Volwassenen</th>
+                        <th class="px-4 py-2 border-b">Kinderen</th>
+                        <th class="px-4 py-2 border-b">Babys</th>
+                        <th class="px-4 py-2 border-b">Vertegenwoordiger</th>
+                        <th class="px-4 py-2 border-b">Allergie Details</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($families as $family)
-                    <tr>
-                        <td>{{ $family->familie_naam }}</td>
-                        <td>{{ $family->familie_omschrijving }}</td>
-                        <td>{{ $family->volwassenen }}</td>
-                        <td>{{ $family->kinderen }}</td>
-                        <td>{{ $family->babys }}</td>
-                        <td>{{ $family->vertegenwoordiger }}</td>
-                        <td class="text-center">
-                            <a href="{{ route('allergies.family', ['familyId' => $family->familie_id]) }}" title="Details">
-                                <span class="bi bi-info-circle"></span>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2 border-b">{{ $family->familie_naam }}</td>
+                        <td class="px-4 py-2 border-b">{{ $family->familie_omschrijving }}</td>
+                        <td class="px-4 py-2 border-b text-center">{{ $family->volwassenen }}</td>
+                        <td class="px-4 py-2 border-b text-center">{{ $family->kinderen }}</td>
+                        <td class="px-4 py-2 border-b text-center">{{ $family->babys }}</td>
+                        <td class="px-4 py-2 border-b">{{ $family->vertegenwoordiger }}</td>
+                        <td class="px-4 py-2 border-b text-center">
+                            <a href="{{ route('allergies.family', ['familyId' => $family->familie_id]) }}" title="Details" aria-label="Details" class="inline-block text-blue-600 hover:text-blue-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 20c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z" />
+                                </svg>
+                            </a>
+                            <a href="{{ route('allergies.family', ['familyId' => $family->familie_id]) }}" title="Wijzig Allergieën" aria-label="Wijzig Allergieën" class="inline-block text-yellow-600 hover:text-yellow-800 ml-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2h6" />
+                                </svg>
                             </a>
                         </td>
                     </tr>
                     @empty
                         @if($selectedAllergy)
                         <tr>
-                            <td colspan="7" class="text-center text-danger">
+                            <td colspan="7" class="text-center text-red-600 py-4">
                                 Er zijn geen gezinnen bekent die de geselecteerde allergie hebben
                             </td>
                         </tr>
                         @else
                         <tr>
-                            <td colspan="7" class="text-center">Geen gezinnen gevonden.</td>
+                            <td colspan="7" class="text-center py-4">Geen gezinnen gevonden.</td>
                         </tr>
                         @endif
                     @endforelse
                 </tbody>
             </table>
-            {{-- Pagination links --}}
-            <div class="d-flex justify-content-center">
-                {{ $families->links() }}
-            </div>
+        </div>
+        {{-- Pagination links --}}
+        <div class="flex justify-center mt-4">
+            {{ $families->links() }}
         </div>
     </div>
-    <div class="row mt-3">
-        <div class="col-12 d-flex justify-content-end">
-            <a href="{{ route('home') }}" class="btn btn-primary">Home</a>
-        </div>
+    <div class="flex justify-end mt-6">
+        <a href="{{ route('home') }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Home</a>
     </div>
 </div>
 @endsection
+
 
