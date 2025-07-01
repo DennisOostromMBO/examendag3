@@ -60,7 +60,7 @@ class SupplierController extends Controller
     /**
      * Toon het formulier om de houdbaarheidsdatum van een product te wijzigen.
      */
-    public function editProductExpiration($productId, Request $request)
+    public function edit($productId, Request $request)
     {
         // Haal het product op via model
         $product = Product::findProduct($productId);
@@ -71,7 +71,7 @@ class SupplierController extends Controller
     /**
      * Werk de houdbaarheidsdatum van een product bij via stored procedure.
      */
-    public function updateProductExpiration(Request $request, $productId)
+    public function update(Request $request, $productId)
     {
         $request->validate([
             'expiration_date' => 'required|date',
