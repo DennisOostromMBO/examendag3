@@ -16,16 +16,27 @@
 
     <div class="row mb-3">
         <div class="col-md-6">
-            <select class="form-select">
-                <option selected>Selecteer Eetwens</option>
-                <option value="1">Omnivoor</option>
-                <option value="2">Vegentarisch</option>
-                <option value="3">Veganistisch</option>
-                <option value="4">GeenVarken</option>
-            </select>
+            <form method="GET" action="{{ route('food-packages.index') }}">
+                <select class="form-select" name="eetwens" onchange="this.form.submit()">
+                    <option value="all" {{ empty($eetwens) || $eetwens == 'all' ? 'selected' : '' }}>Selecteer Eetwens
+                    </option>
+                    <option value="Omnivoor" {{ (isset($eetwens) && $eetwens == 'Omnivoor') ? 'selected' : '' }}>
+                        Omnivoor
+                    </option>
+                    <option value="Vegentarisch" {{ (isset($eetwens) && $eetwens == 'Vegentarisch') ? 'selected' : '' }}>
+                        Vegentarisch
+                    </option>
+                    <option value="Veganistisch" {{ (isset($eetwens) && $eetwens == 'Veganistisch') ? 'selected' : '' }}>
+                        Veganistisch
+                    </option>
+                    <option value="GeenVarken" {{ (isset($eetwens) && $eetwens == 'GeenVarken') ? 'selected' : '' }}>
+                        GeenVarken
+                    </option>
+                </select>
+            </form>
         </div>
         <div class="col-md-6 text-end">
-            <button class="btn btn-secondary">Toon Gezinnen</button>
+            <!-- Optional: Remove the button, as the form submits on change -->
         </div>
     </div>
 
@@ -40,23 +51,29 @@
                         <th>Kinderen</th>
                         <th>Babys</th>
                         <th>Vertegenwoordiger</th>
-                        <th>Voedselpakket Details</th>
+                        <th>VoedselPakket Details</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @for ($i = 0; $i < 5; $i++)
+                    @forelse ($foodParcels as $parcel)
                         <tr>
-                            <td>~~~~</td>
-                            <td>~~~~</td>
-                            <td>~~~~</td>
-                            <td>~~~~</td>
-                            <td>~~~~</td>
-                            <td>~~~~</td>
-                            <td class="text-center">
-                                <i class="bi bi-box"></i>
+                            <td>{{ $parcel->Gezinsnaam }}</td>
+                            <td>{{ $parcel->Omschrijving }}</td>
+                            <td>{{ $parcel->Volwassenen }}</td>
+                            <td>{{ $parcel->Kinderen }}</td>
+                            <td>{{ $parcel->Babys }}</td>
+                            <td>{{ $parcel->Vertegenwoordiger }}</td>
+                            <td>
+                                <a href="{{ route('food-packages.edit', $parcel->id) }}" class="btn btn-sm btn-warning">
+                                    Bewerken
+                                </a>
                             </td>
                         </tr>
-                    @endfor
+                    @empty
+                        <tr>
+                            <td colspan="12" class="text-center">Geen voedselpakketten gevonden.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
