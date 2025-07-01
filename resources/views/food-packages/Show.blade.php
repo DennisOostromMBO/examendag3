@@ -11,6 +11,17 @@
         </a>
     </h4>
 
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+        <script>
+            setTimeout(function() {
+                window.location.href = "{{ route('food-packages.index') }}";
+            }, 3000);
+        </script>
+    @endif
+
     <table class="table table-bordered w-auto mb-4">
         <tr>
             <th>Naam:</th>

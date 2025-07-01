@@ -72,7 +72,8 @@ class FoodParcelController extends Controller
             'NietMeerIngeschreven',
             'Uitgereikt'
         ];
-        return view('food-packages.edit', compact('pakket', 'statusOptions'));
+        $disabled = $pakket->Status === 'NietMeerIngeschreven';
+        return view('food-packages.edit', compact('pakket', 'statusOptions', 'disabled'));
     }
 
     public function update(Request $request, $pakketnummer)
@@ -102,6 +103,9 @@ class FoodParcelController extends Controller
             $datumUitgifte
         ]);
 
-        return redirect()->route('food-packages.show', $pakketnummer)->with('success', 'Status bijgewerkt.');
+        // Redirect to show page with success message
+        return redirect()
+            ->route('food-packages.show', $pakketnummer)
+            ->with('success', 'De wijziging is doorgevoerd');
     }
 }

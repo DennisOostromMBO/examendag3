@@ -79,7 +79,17 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="12" class="text-center">Geen voedselpakketten gevonden.</td>
+                            <td colspan="12" class="text-center">
+                                @if(request('eetwens') && request('eetwens') !== 'all')
+                                    <div class="alert alert-warning m-0">
+                                        Er zijn geen gezinnen bekent die de geselecteerde eetwens hebben
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning m-0">
+                                        Geen voedselpakketten gevonden.
+                                    </div>
+                                @endif
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
