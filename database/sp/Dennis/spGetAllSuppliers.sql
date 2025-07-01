@@ -1,5 +1,3 @@
-DELIMITER $$
-
 CREATE PROCEDURE spGetAllSuppliers()
 BEGIN
     SELECT
@@ -13,6 +11,4 @@ BEGIN
     FROM suppliers s
     INNER JOIN contact_supplier cs ON cs.supplier_id = s.id
     INNER JOIN contacts c ON c.id = cs.contact_id;
-END$$
-
-DELIMITER ;
+END;

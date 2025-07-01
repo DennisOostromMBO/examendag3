@@ -1,5 +1,3 @@
-DELIMITER $$
-
 CREATE PROCEDURE spGetAllProductsBySupplierId(IN in_supplier_id INT)
 BEGIN
     SELECT
@@ -11,6 +9,6 @@ BEGIN
     FROM products p
     INNER JOIN product_supplier ps ON ps.product_id = p.id
     WHERE ps.supplier_id = in_supplier_id;
-END$$
+END;
 
-DELIMITER ;
+
