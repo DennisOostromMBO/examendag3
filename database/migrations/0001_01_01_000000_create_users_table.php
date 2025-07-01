@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->unsignedBigInteger('person_id');
+            $table->string('login_name');
+            $table->string('username')->unique();
             $table->string('password');
-            $table->rememberToken();
+            $table->boolean('is_logged_in');
+            $table->timestamp('logged_in_at')->nullable();
+            $table->timestamp('logged_out_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('person_id')->references('id')->on('persons')->cascadeOnDelete();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
