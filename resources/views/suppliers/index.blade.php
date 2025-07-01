@@ -4,11 +4,10 @@
 @section('title', 'Leveranciers - Voedselbank Maaskantje')
 
 @section('content')
-<div class="max-w-screen-xl mx-auto mt-8">
-    {{-- Navbar bovenaan --}}
-    <div class="flex justify-end mb-6">
-        <a href="{{ route('home') }}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">Home</a>
-    </div>
+{{-- Navbar bovenaan --}}
+<div class="w-full bg-gray-100 py-4 mb-8">
+</div>
+<div class="max-w-screen-xl mx-auto mt-2">
     <form method="get" action="{{ route('suppliers.index') }}">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
@@ -44,18 +43,21 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse($suppliers as $supplier)
                     <tr>
-                        <td class="px-4 py-2 truncate">{{ $supplier->name }}</td>
-                        <td class="px-4 py-2 truncate">{{ $supplier->contact_person }}</td>
-                        <td class="px-4 py-2 truncate">{{ $supplier->email }}</td>
-                        <td class="px-4 py-2 truncate">{{ $supplier->mobile }}</td>
-                        <td class="px-4 py-2 truncate">{{ $supplier->supplier_number }}</td>
-                        <td class="px-4 py-2 truncate">{{ $supplier->supplier_type }}</td>
+                        <td class="px-4 py-2 truncate">{{ $supplier['name'] ?? '' }}</td>
+                        <td class="px-4 py-2 truncate">{{ $supplier['contact_person'] ?? '' }}</td>
+                        <td class="px-4 py-2 truncate">{{ $supplier['email'] ?? '' }}</td>
+                        <td class="px-4 py-2 truncate">{{ $supplier['mobile'] ?? '' }}</td>
+                        <td class="px-4 py-2 truncate">{{ $supplier['supplier_number'] ?? '' }}</td>
+                        <td class="px-4 py-2 truncate">{{ $supplier['supplier_type'] ?? '' }}</td>
                         <td class="px-4 py-2 text-center">
-                            <button type="button" class="text-gray-600 hover:text-green-600 transition" title="Product details">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 4h6a2 2 0 002-2v-6a2 2 0 00-2-2h-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                </svg>
-                            </button>
+                            @if(isset($supplier['id']))
+                                <a href="{{ route('suppliers.products', $supplier['id']) }}" class="text-green-700 hover:text-green-900 transition" title="Product details">
+                                    {{-- Gebruik een "eye" icoon voor zichtbaarheid --}}
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="inline h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 5-7 9-9 9s-9-4-9-9 7-9 9-9 9 4 9 9z" />
+                                    </svg>
+                                </a>
+                            @endif
                         </td>
                     </tr>
                 @empty

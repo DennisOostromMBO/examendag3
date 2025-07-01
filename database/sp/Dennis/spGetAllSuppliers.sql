@@ -3,6 +3,7 @@ DELIMITER $$
 CREATE PROCEDURE spGetAllSuppliers()
 BEGIN
     SELECT
+        s.id,
         s.name,
         s.contact_person,
         s.supplier_number,

@@ -32,4 +32,26 @@ class SupplierController extends Controller
             return back()->with('error', 'Er is een fout opgetreden bij het ophalen van de leveranciers.');
         }
     }
+
+    /**
+     * Toon de producten van een leverancier.
+     */
+    public function show($id)
+    {
+        try {
+            // Haal supplier info op
+            $supplier = \App\Models\Supplier::getSupplierInfo($id);
+
+            // Haal producten op via stored procedure
+            $products = \App\Models\Supplier::getProductsBySupplierId($id);
+
+            return view('suppliers.products', [
+                'supplier' => $supplier,
+                'products' => $products,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Fout bij ophalen producten van leverancier: ' . $e->getMessage());
+            return back()->with('error', 'Er is een fout opgetreden bij het ophalen van de producten.');
+        }
+    }
 }

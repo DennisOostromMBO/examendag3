@@ -21,13 +21,32 @@ class Supplier extends Model
 
     /**
      * Haal alle suppliers op via de stored procedure, optioneel gefilterd op type.
+     * Zorg dat het id-veld altijd aanwezig is.
      */
     public static function getAllWithContactInfo($type = null)
     {
-        $suppliers = collect(DB::select('CALL spGetAllSuppliers()'));
+        $suppliers = collect(DB::select('CALL spGetAllSuppliers()'))->map(function ($item) {
+            return (array) $item;
+        });
         if ($type) {
             $suppliers = $suppliers->where('supplier_type', $type);
         }
-        return $suppliers;
+        return $suppliers->values();
+    }
+
+    /**
+     * Haal de supplier info op voor een specifieke supplier.
+     */
+    public static function getSupplierInfo($supplierId)
+    {
+        return self::where('id', $supplierId)->first();
+    }
+
+    /**
+     * Haal alle producten op voor een supplier via de stored procedure.
+     */
+    public static function getProductsBySupplierId($supplierId)
+    {
+        return DB::select('CALL spGetAllProductsBySupplierId(?)', [$supplierId]);
     }
 }
