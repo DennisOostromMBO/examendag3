@@ -62,7 +62,7 @@
                 @empty
                     <tr>
                         <td colspan="7" class="px-4 py-4 text-center bg-yellow-100 text-yellow-800 rounded">
-                            Er zijn geen leveranciers bekend van het geselecteerde leverancierstype
+                            Er zijn geen leveranciers bekend van het geselecteerde leverancierstype.
                         </td>
                     </tr>
                 @endforelse
