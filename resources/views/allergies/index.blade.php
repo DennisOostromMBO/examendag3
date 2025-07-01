@@ -59,7 +59,7 @@
                     @empty
                         @if($selectedAllergy)
                         <tr>
-                            <td colspan="7" class="text-center text-red-600 py-4">
+                            <td colspan="7" class="text-center py-4 bg-yellow-100 border border-yellow-300 text-yellow-800 font-medium">
                                 Er zijn geen gezinnen bekent die de geselecteerde allergie hebben
                             </td>
                         </tr>
@@ -82,6 +82,6 @@
     </div>
 </div>
 @endsection
-    
+
 
 
