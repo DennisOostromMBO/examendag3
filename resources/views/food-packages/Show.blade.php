@@ -7,7 +7,7 @@
 <div class="container mt-4">
     <h4>
         <a href="{{ route('food-packages.index') }}" class="text-success text-decoration-none">
-            Overzicht Voedselpakketten
+            Overzicht voedselpakketten
         </a>
     </h4>
 
