@@ -51,6 +51,7 @@
                         <th>Kinderen</th>
                         <th>Babys</th>
                         <th>Vertegenwoordiger</th>
+                        <th>Status</th>
                         <th>VoedselPakket Details</th>
                     </tr>
                 </thead>
@@ -63,10 +64,15 @@
                             <td>{{ $parcel->Kinderen }}</td>
                             <td>{{ $parcel->Babys }}</td>
                             <td>{{ $parcel->Vertegenwoordiger }}</td>
+                            <td>{{ $parcel->Status}}</td>
                             <td>
-                                <a href="{{ route('food-packages.edit', $parcel->id) }}" class="btn btn-sm btn-warning">
-                                    Bewerken
-                                </a>
+                                @if(!empty($parcel->Pakketnummer))
+                                    <a href="{{ route('food-packages.show', $parcel->Pakketnummer) }}" class="btn btn-sm btn-info">
+                                        Details
+                                    </a>
+                                @else
+                                    <span class="text-muted">Geen pakket</span>
+                                @endif
                             </td>
                         </tr>
                     @empty
