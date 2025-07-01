@@ -53,9 +53,7 @@
                         <td>{{ $family->babys }}</td>
                         <td>{{ $family->vertegenwoordiger }}</td>
                         <td class="text-center">
-                            <a href="#" title="Details" data-bs-toggle="tooltip" data-bs-placement="top" 
-                               data-allergy="{{ $family->allergie_naam }}" 
-                               data-description="{{ $family->allergie_omschrijving }}">
+                            <a href="{{ route('allergies.family', ['familyId' => $family->familie_id]) }}" title="Details">
                                 <span class="bi bi-info-circle"></span>
                             </a>
                         </td>

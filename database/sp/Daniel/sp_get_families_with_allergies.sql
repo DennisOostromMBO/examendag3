@@ -6,6 +6,7 @@ CREATE PROCEDURE sp_get_families_with_allergies(IN allergy_id INT)
 BEGIN
     IF allergy_id IS NULL THEN
         SELECT 
+            f.id AS familie_id, -- add this line
             f.name AS familie_naam,
             f.description AS familie_omschrijving,
             f.adults AS volwassenen,
@@ -25,6 +26,7 @@ BEGIN
         ORDER BY f.name, a.name;
     ELSE
         SELECT 
+            f.id AS familie_id, -- add this line
             f.name AS familie_naam,
             f.description AS familie_omschrijving,
             f.adults AS volwassenen,
