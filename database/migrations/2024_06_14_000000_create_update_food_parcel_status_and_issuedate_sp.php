@@ -10,6 +10,7 @@ return new class extends Migration
     {
         // Drop bestaande procedure
         DB::unprepared('DROP PROCEDURE IF EXISTS Update_Food_Parcel_Status_And_IssueDate');
+        DB::unprepared('DROP PROCEDURE IF EXISTS Get_all_FoodParcels');
 
         // Procedure aanmaken vanuit SQL-bestand
         $path = database_path('sp/Mahdi/Update_Food_Parcels.sql');

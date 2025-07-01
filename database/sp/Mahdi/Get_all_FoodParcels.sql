@@ -1,5 +1,3 @@
-DELIMITER $$
-
 CREATE PROCEDURE Get_all_FoodParcels()
 BEGIN
     SELECT
@@ -27,6 +25,4 @@ BEGIN
         fw.name,
         fp.parcel_number, fp.composition_date, fp.issue_date, fp.status
     ORDER BY fp.composition_date DESC;
-END$$
-
-DELIMITER ;
+END;
