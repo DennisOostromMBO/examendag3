@@ -5,8 +5,7 @@
 
 @section('content')
 {{-- Navbar bovenaan --}}
-<div class="w-full bg-gray-100 py-4 mb-8">
-</div>
+<div class="w-full bg-gray-100 py-4 mb-8"></div>
 <div class="max-w-screen-xl mx-auto mt-2">
     <form method="get" action="{{ route('suppliers.index') }}">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -69,6 +68,9 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+    <div class="flex justify-end mt-4">
+        <a href="{{ url('/') }}" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">Home</a>
     </div>
 </div>
 @endsection

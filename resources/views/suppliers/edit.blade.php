@@ -37,7 +37,7 @@
             @enderror
             @if(session('error'))
                 <div class="mt-1 text-red-600 text-xs font-semibold">
-                    De houdbaarheidsdatum mag met maximaal 7 dagen<br>worden verlengd
+                    De houdbaarheidsdatum mag met maximaal 7 dagen worden verlengd
                 </div>
             @endif
         </div>

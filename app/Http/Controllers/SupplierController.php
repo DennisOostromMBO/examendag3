@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,10 +42,10 @@ class SupplierController extends Controller
     {
         try {
             // Haal supplier info op
-            $supplier = \App\Models\Supplier::getSupplierInfo($id);
+            $supplier = Supplier::getSupplierInfo($id);
 
             // Haal producten op via stored procedure
-            $products = \App\Models\Supplier::getProductsBySupplierId($id);
+            $products = Supplier::getProductsBySupplierId($id);
 
             return view('suppliers.products', [
                 'supplier' => $supplier,
@@ -61,9 +62,9 @@ class SupplierController extends Controller
      */
     public function editProductExpiration($productId, Request $request)
     {
-        $product = DB::table('products')->where('id', $productId)->first();
+        // Haal het product op via model
+        $product = Product::findProduct($productId);
         $supplierId = $request->get('supplier_id');
-        // Gebruik de juiste view in de suppliers map
         return view('suppliers.edit', compact('product', 'supplierId'));
     }
 
@@ -77,7 +78,8 @@ class SupplierController extends Controller
             'supplier_id' => 'required|integer'
         ]);
 
-        $current = DB::table('products')->where('id', $productId)->value('expiration_date');
+        // Haal huidige houdbaarheidsdatum op via model
+        $current = Product::getExpirationDate($productId);
         $new = $request->input('expiration_date');
 
         // Alleen deze error als je verder dan 7 dagen invult
@@ -85,10 +87,8 @@ class SupplierController extends Controller
             return redirect()->back()->with('error', true);
         }
 
-        DB::statement('CALL spUpdateProducts(?, ?)', [
-            $productId,
-            $new
-        ]);
+        // Update via model
+        Product::updateExpirationDate($productId, $new);
 
         return redirect()->back()->with('success', 'Houdbaarheidsdatum succesvol bijgewerkt.');
     }
