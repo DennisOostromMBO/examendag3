@@ -10,7 +10,7 @@
         <div class="col-12">
             <h4>
                 <a href="#" class="text-success text-decoration-none">
-                    Overzicht gezinnen met voedselpakketten gemaakt door Mahdi
+                    Overzicht gezinnen met voedselpakketten
                 </a>
             </h4>
         </div>
