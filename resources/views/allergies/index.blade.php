@@ -32,6 +32,12 @@
     <div class="row">
         <div class="col-12">
             {{-- Debug output --}}
+            <div>
+                <strong>Count:</strong> {{ count($families) }}
+                @if(count($families))
+                    <pre>{{ print_r($families[0], true) }}</pre>
+                @endif
+            </div>
             @if(config('app.debug'))
                 <pre style="background:#f8f9fa; color:#333; border:1px solid #ccc; padding:10px;">
 families: {{ var_export($families, true) }}

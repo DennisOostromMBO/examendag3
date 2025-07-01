@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AllergyController;
 
-Route::get('/allergies', function () {
-    return view('allergies.index');
-})->name('allergies.index');
+Route::get('/allergies', [AllergyController::class, 'index'])->name('allergies.index');
+

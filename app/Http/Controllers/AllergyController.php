@@ -14,6 +14,11 @@ class AllergyController extends Controller
         $allergyId = $request->input('allergy_id');
         $families = Allergy::getFamiliesWithAllergies($allergyId);
         $allergies = Allergy::all();
+
+        // Debug: dump the families variable
+        // Remove this after debugging
+        // dd($families);
+
         return view('allergies.index', [
             'families' => $families,
             'allergies' => $allergies,
