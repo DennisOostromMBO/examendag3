@@ -54,17 +54,17 @@ class AllergyController extends Controller
         $currentAllergyId = DB::table('allergy_person')->where('person_id', $personId)->pluck('allergy_id')->first();
         $currentAllergy = $allergies->firstWhere('id', $currentAllergyId);
 
-        // Show warning if the current allergy is "Pinda's" and not confirmed
+        // Only show warning if current allergy is "Pinda's" and confirm is NOT set
         if ($currentAllergy && strtolower($currentAllergy->name) === "pinda's" && !request()->has('confirm')) {
             return view('allergies.edit_person_allergy', [
                 'person' => $person,
                 'allergies' => $allergies,
                 'currentAllergyId' => $currentAllergyId,
                 'show_pinda_warning' => true,
-                'selected_allergy_id' => old('allergy_id', $currentAllergyId),
             ]);
         }
 
+        // If confirm is set, show the edit form as normal
         return view('allergies.edit_person_allergy', compact('person', 'allergies', 'currentAllergyId'));
     }
 
