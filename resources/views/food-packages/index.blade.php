@@ -17,25 +17,32 @@
     </div>
 
     <div class="row mb-3">
-        <div class="col-md-6">
+        <div class="col-md-6 offset-md-6">
             <form method="GET" action="{{ route('food-packages.index') }}">
-                <select class="form-select" name="eetwens" onchange="this.form.submit()">
-                    <option value="all" {{ empty($eetwens) || $eetwens == 'all' ? 'selected' : '' }}>Selecteer Eetwens
-                    </option>
-                    <option value="Omnivoor" {{ (isset($eetwens) && $eetwens == 'Omnivoor') ? 'selected' : '' }}>
-                        Omnivoor
-                    </option>
-                    <option value="Vegentarisch" {{ (isset($eetwens) && $eetwens == 'Vegentarisch') ? 'selected' : '' }}>
-                        Vegentarisch
-                    </option>
-                    <option value="Veganistisch" {{ (isset($eetwens) && $eetwens == 'Veganistisch') ? 'selected' : '' }}>
-                        Veganistisch
-                    </option>
-                    <option value="GeenVarken" {{ (isset($eetwens) && $eetwens == 'GeenVarken') ? 'selected' : '' }}>
-                        GeenVarken
-                    </option>
-                </select>
+                <div class="d-flex justify-content-end mb-3">
+                    <select class="form-select me-2 w-auto" name="eetwens">
+                        <option value="all" {{ empty($eetwens) || $eetwens == 'all' ? 'selected' : '' }}>
+                            Selecteer Eetwens
+                        </option>
+                        <option value="Omnivoor" {{ (isset($eetwens) && $eetwens == 'Omnivoor') ? 'selected' : '' }}>
+                            Omnivoor
+                        </option>
+                        <option value="Vegentarisch" {{ (isset($eetwens) && $eetwens == 'Vegentarisch') ? 'selected' : '' }}>
+                            Vegentarisch
+                        </option>
+                        <option value="Veganistisch" {{ (isset($eetwens) && $eetwens == 'Veganistisch') ? 'selected' : '' }}>
+                            Veganistisch
+                        </option>
+                        <option value="GeenVarken" {{ (isset($eetwens) && $eetwens == 'GeenVarken') ? 'selected' : '' }}>
+                            GeenVarken
+                        </option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary">
+                        Toon Gezinnen
+                    </button>
+                </div>
             </form>
+        </div>
         </div>
         <div class="col-md-6 text-end">
             <!-- Optional: Remove the button, as the form submits on change -->
