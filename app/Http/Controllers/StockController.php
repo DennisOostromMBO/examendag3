@@ -295,7 +295,7 @@ class StockController extends Controller
 
                     // Generic error handling for other failures
                     return redirect()->back()
-                                   ->with('error', 'Er is een fout opgetreden bij het bijwerken.')
+                                   ->with('error', 'De productgegevens kunnen niet worden gewijzigd')
                                    ->withInput();  // Preserve user input
                 }
             }
@@ -309,6 +309,7 @@ class StockController extends Controller
 
             return redirect()->back()
                            ->withErrors($e->errors())
+                           ->with('error', 'De productgegevens kunnen niet worden gewijzigd')
                            ->withInput();
         } catch (\Exception $e) {
             // Handle unexpected errors
@@ -320,7 +321,7 @@ class StockController extends Controller
             ]);
 
             return redirect()->back()
-                           ->with('error', 'Er is een onverwachte fout opgetreden. Probeer het later opnieuw.')
+                           ->with('error', 'De productgegevens kunnen niet worden gewijzigd')
                            ->withInput();
         }
     }
