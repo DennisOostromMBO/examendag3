@@ -6,33 +6,41 @@ use App\Models\FoodParcel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class FoodParcelController extends Controller
 {
     public function index(Request $request)
     {
-        // Haal eetwens op uit de request en filter voedselpakketten indien nodig
         $eetwens = $request->input('eetwens');
-        // Use the model method to call the SP
-        $foodParcels = FoodParcel::getAllFoodParcels();
-        try {
-            if ($eetwens && $eetwens !== 'all') {
-                $foodParcels = array_filter($foodParcels, function($parcel) use ($eetwens) {
-                    return isset($parcel->Eetwens) && $parcel->Eetwens === $eetwens;
-                });
-            }
-        } catch (\Exception $e) {
-            // Log the error or handle it as needed
-            return back()->withErrors(['msg' => 'Er is een fout opgetreden bij het filteren van de voedselpakketten.']);
+        $allParcels = collect(FoodParcel::getAllFoodParcels());
+
+        // Filter if needed
+        if ($eetwens && $eetwens !== 'all') {
+            $allParcels = $allParcels->filter(function($parcel) use ($eetwens) {
+                return isset($parcel->Eetwens) && $parcel->Eetwens === $eetwens;
+            });
         }
 
-        // Remove duplicate families by Gezinsnaam (keep the first occurrence)
-        $foodParcels = collect($foodParcels)
-            ->unique('Gezinsnaam')
-            ->values()
-            ->all();
+        // Remove duplicate families by Gezinsnaam
+        $uniqueParcels = $allParcels->unique('Gezinsnaam')->values();
 
-        return view('food-packages.index', compact('foodParcels', 'eetwens'));
+        // Pagination (like AllergyController)
+        $perPage = 3;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $pagedItems = $uniqueParcels->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $foodParcels = new LengthAwarePaginator(
+            $pagedItems,
+            $uniqueParcels->count(),
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('food-packages.index', [
+            'foodParcels' => $foodParcels,
+            'eetwens' => $eetwens
+        ]);
     }
 
     public function show($pakketnummer)

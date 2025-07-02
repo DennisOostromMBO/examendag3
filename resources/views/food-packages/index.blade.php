@@ -99,6 +99,10 @@
                     @endforelse
                 </tbody>
             </table>
+            {{-- Pagination links --}}
+            <div class="d-flex justify-content-center">
+                {{ $foodParcels->links() }}
+            </div>
         </div>
     </div>
 
