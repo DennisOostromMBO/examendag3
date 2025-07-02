@@ -11,7 +11,7 @@ class CreateStoredProcedures extends Migration
     {
         // First, add the delivered_quantity column to product_warehouse table
         $this->addDeliveredQuantityColumn();
-        
+
         // Then install all stored procedures
         $this->createGetProductStockOverviewProcedure();
         $this->createGetActiveCategoriesProcedure();
@@ -30,7 +30,7 @@ class CreateStoredProcedures extends Migration
         DB::unprepared('DROP PROCEDURE IF EXISTS GetProductDetails');
         DB::unprepared('DROP PROCEDURE IF EXISTS UpdateWarehouse');
         DB::unprepared('DROP PROCEDURE IF EXISTS GetWarehouseDetails');
-        
+
         // Remove the delivered_quantity column
         Schema::table('product_warehouse', function (Blueprint $table) {
             $table->dropColumn('delivered_quantity');
