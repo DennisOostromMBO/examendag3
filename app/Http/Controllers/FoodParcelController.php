@@ -11,13 +11,15 @@ class FoodParcelController extends Controller
 {
     public function index(Request $request)
     {
+        // Haal eetwens op uit de request en filter voedselpakketten indien nodig
         $eetwens = $request->input('eetwens');
-        $foodParcels = \DB::select('CALL Get_all_FoodParcels()');
+        // Use the model method to call the SP
+        $foodParcels = FoodParcel::getAllFoodParcels();
         try {
             if ($eetwens && $eetwens !== 'all') {
-            $foodParcels = array_filter($foodParcels, function($parcel) use ($eetwens) {
-                return isset($parcel->Eetwens) && $parcel->Eetwens === $eetwens;
-            });
+                $foodParcels = array_filter($foodParcels, function($parcel) use ($eetwens) {
+                    return isset($parcel->Eetwens) && $parcel->Eetwens === $eetwens;
+                });
             }
         } catch (\Exception $e) {
             // Log the error or handle it as needed
@@ -35,7 +37,8 @@ class FoodParcelController extends Controller
 
     public function show($pakketnummer)
     {
-        $parcels = \DB::select('CALL Get_all_FoodParcels()');
+        // Use the model method to call the SP
+        $parcels = FoodParcel::getAllFoodParcels();
         $parcel = collect($parcels)->firstWhere('Pakketnummer', $pakketnummer);
         if (!$parcel) {
             abort(404);
@@ -62,10 +65,11 @@ class FoodParcelController extends Controller
 
         return view('food-packages.Show', compact('parcel', 'pakketten'));
     }
-
+    // Show the edit form for a specific food parcel
     public function edit($pakketnummer)
     {
-        $parcels = DB::select('CALL Get_all_FoodParcels()');
+        // Use the model method to call the SP
+        $parcels = FoodParcel::getAllFoodParcels();
         $pakket = collect($parcels)->firstWhere('Pakketnummer', $pakketnummer);
         if (!$pakket) {
             abort(404);
@@ -82,17 +86,20 @@ class FoodParcelController extends Controller
 
     public function update(Request $request, $pakketnummer)
     {
+        // Validate the incoming request data
         $request->validate([
             'Status' => 'required|string|max:50',
         ]);
 
         $status = $request->input('Status');
-        $parcels = DB::select('CALL Get_all_FoodParcels()');
+        // Use the model method to call the SP
+        $parcels = FoodParcel::getAllFoodParcels();
         $pakket = collect($parcels)->firstWhere('Pakketnummer', $pakketnummer);
         if (!$pakket) {
             abort(404);
         }
 
+        // Set the issue date if the status is 'Uitgereikt'
         $datumUitgifte = null;
         if ($status === 'Uitgereikt') {
             $datumUitgifte = Carbon::now()->toDateString();
@@ -101,11 +108,8 @@ class FoodParcelController extends Controller
         // Find the foodparcel id by pakketnummer
         $foodparcelId = DB::table('foodparcels')->where('parcel_number', $pakketnummer)->value('id');
 
-        DB::statement('CALL Update_Food_Parcel_Status_And_IssueDate(?, ?, ?)', [
-            $foodparcelId,
-            $status,
-            $datumUitgifte
-        ]);
+        // Use the model method to call the SP
+        FoodParcel::updateFoodParcelStatusAndIssueDate($foodparcelId, $status, $datumUitgifte);
 
         // Redirect to show page with success message
         return redirect()

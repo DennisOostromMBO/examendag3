@@ -14,8 +14,15 @@ class AllergyController extends Controller
     public function index(Request $request): View
     {
         $allergyId = $request->input('allergy_id');
-        $families = Allergy::getFamiliesWithAllergies($allergyId, 5);
+        $families = Allergy::getFamiliesWithAllergies($allergyId, 3);
         $allergies = Allergy::all();
+
+        // Fix: Only filter the collection by familie_id, then update paginator items
+        // Also, make sure to use the familie_id as string for unique, as sometimes it can be int/object
+        $uniqueFamilies = $families->getCollection()
+            ->unique(function($item) { return (string) $item->familie_id; })
+            ->values();
+        $families->setCollection($uniqueFamilies);
 
         return view('allergies.index', [
             'families' => $families,
