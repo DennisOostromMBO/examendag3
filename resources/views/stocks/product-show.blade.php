@@ -49,6 +49,34 @@
         </div>
     </div>
 
+    {{-- Success Message Section --}}
+    {{-- Displays when returning from successful product update --}}
+    {{-- Shows confirmation message as per Wireframe-05 --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {{-- Auto-redirect script after successful update --}}
+        {{-- Gives user 3 seconds to read success message before returning to stock overview --}}
+        <script>
+            setTimeout(function() {
+                window.location.href = "{{ route('stocks.overview') }}";
+            }, 3000);
+        </script>
+    @endif
+
+    {{-- Error Message Section --}}
+    {{-- Displays any error messages if needed --}}
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     {{-- Comprehensive Product Information Display --}}
     {{-- Table format for clear data presentation --}}
     <div class="row mb-4">

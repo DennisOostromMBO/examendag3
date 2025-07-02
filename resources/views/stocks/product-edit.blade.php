@@ -59,13 +59,6 @@
             <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
         </div>
-        {{-- Auto-redirect script after successful update --}}
-        {{-- Gives user time to read success message before redirecting --}}
-        <script>
-            setTimeout(function() {
-                window.location.href = "{{ route('stocks.product.show', $product->id ?? 1) }}";
-            }, 3000);
-        </script>
     @endif
 
     {{-- Error Message Section --}}
@@ -142,11 +135,11 @@
                 {{-- Main editable field for updating stock quantities --}}
                 <div class="mb-3">
                     <label for="delivered_quantity" class="form-label"><strong>Aantal uitgeleverde producten:</strong></label>
-                    <input type="number" class="form-control @if(session('error') || $errors->has('delivered_quantity')) is-invalid @endif" 
+                    <input type="number" class="form-control @if(session('error') || $errors->has('delivered_quantity')) is-invalid @endif"
                            id="delivered_quantity" name="delivered_quantity"
                            value="{{ old('delivered_quantity', $stockInfo['delivered_quantity'] ?? 0) }}"
                            required min="0">
-                    
+
                     {{-- Error messages specifically for this field matching Wireframe 7 --}}
                     @if(session('error') && str_contains(session('error'), 'meer producten uitgeleverd'))
                         <div class="text-danger mt-1" style="font-size: 0.875rem;">
@@ -154,7 +147,7 @@
                             Er worden meer producten uitgeleverd dan er in voorraad zijn
                         </div>
                     @endif
-                    
+
                     {{-- Display other validation errors for this field --}}
                     @error('delivered_quantity')
                         <div class="text-danger mt-1" style="font-size: 0.875rem;">

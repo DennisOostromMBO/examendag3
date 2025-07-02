@@ -271,7 +271,7 @@ class StockController extends Controller
                 ]);
 
                 return redirect()->route('stocks.product.show', $id)
-                               ->with('success', 'Product succesvol bijgewerkt.');
+                               ->with('success', 'De productgegevens zijn gewijzigd');
             } else {
                 // Handle specific business logic failures
                 if ($result['result'] === 'INSUFFICIENT_STOCK') {
