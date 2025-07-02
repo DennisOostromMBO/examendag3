@@ -70,29 +70,29 @@
     </div>
 
     {{-- Stock Data Table Section --}}
-    {{-- Displays stock information if data is available --}}
-    {{-- Conditional rendering based on stock availability --}}
-    @if(count($stocks) > 0)
-        {{-- Responsive table wrapper for mobile compatibility --}}
-        <div class="table-responsive">
-            {{-- Main stock data table --}}
-            {{-- Bootstrap styled table with borders for clear data separation --}}
-            <table class="table table-bordered">
-                {{-- Table header with light background --}}
-                <thead class="table-light">
-                    <tr>
-                        {{-- Column headers in Dutch for Voedselbank users --}}
-                        {{-- Each column represents key stock information --}}
-                        <th>Productnaam</th>              {{-- Product name --}}
-                        <th>Categorie</th>                {{-- Product category --}}
-                        <th>Eenheid</th>                  {{-- Package unit (piece, box, kg) --}}
-                        <th>Aantal</th>                   {{-- Quantity in stock --}}
-                        <th>Houdbaarheidsdatum</th>       {{-- Expiry date --}}
-                        <th>Magazijn</th>                 {{-- Warehouse/supplier info --}}
-                        <th>Voorraad Details</th>         {{-- Link to detailed view --}}
-                    </tr>
-                </thead>
-                <tbody>
+    {{-- Always show table structure for consistency --}}
+    {{-- Responsive table wrapper for mobile compatibility --}}
+    <div class="table-responsive">
+        {{-- Main stock data table --}}
+        {{-- Bootstrap styled table with borders for clear data separation --}}
+        <table class="table table-bordered">
+            {{-- Table header with light background --}}
+            <thead class="table-light">
+                <tr>
+                    {{-- Column headers in Dutch for Voedselbank users --}}
+                    {{-- Each column represents key stock information --}}
+                    <th>Productnaam</th>              {{-- Product name --}}
+                    <th>Categorie</th>                {{-- Product category --}}
+                    <th>Eenheid</th>                  {{-- Package unit (piece, box, kg) --}}
+                    <th>Aantal</th>                   {{-- Quantity in stock --}}
+                    <th>Houdbaarheidsdatum</th>       {{-- Expiry date --}}
+                    <th>Magazijn</th>                 {{-- Warehouse/supplier info --}}
+                    <th>Voorraad Details</th>         {{-- Link to detailed view --}}
+                </tr>
+            </thead>
+            <tbody>
+                {{-- Conditional rendering based on stock availability --}}
+                @if(count($stocks) > 0)
                     {{-- Loop through each stock item --}}
                     {{-- Each row represents one stock entry with all relevant info --}}
                     @foreach($stocks as $stock)
@@ -122,25 +122,27 @@
                             </td>
                         </tr>
                     @endforeach
-                </tbody>
-            </table>
-        </div>
-    @else
-        {{-- Empty State Section --}}
-        {{-- Displayed when no stock data is available --}}
-        {{-- Shows user-friendly warning message in Dutch --}}
-        <div class="text-center py-5">
-            {{-- Yellow warning alert with consistent styling --}}
-            {{-- Icon and message provide clear feedback to users --}}
-            <div class="alert alert-warning d-inline-block">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                Er zijn geen producten bekend die behoren bij de geselecteerde categorieen
-            </div>
-        </div>
-    @endif
+                @else
+                    {{-- Empty State Row --}}
+                    {{-- Single row spanning all columns with warning message --}}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            {{-- Yellow warning alert with consistent styling --}}
+                            {{-- Icon and message provide clear feedback to users --}}
+                            <div class="alert alert-warning mb-0 d-inline-block">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Er zijn geen producten bekend die behoren bij de geselecteerde categorieen
+                            </div>
+                        </td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
+    </div>
 
     {{-- Pagination Section --}}
     {{-- Custom pagination controls for stock data --}}
+    {{-- Only show pagination when data is available --}}
     @if(count($stocks) > 0 && isset($pagination) && $pagination['last_page'] > 1)
         <div class="row mt-4">
             <div class="col-12">

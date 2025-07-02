@@ -56,6 +56,7 @@
     {{-- Auto-dismissible alert with fade animation --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
         </div>
         {{-- Auto-redirect script after successful update --}}
@@ -69,9 +70,21 @@
 
     {{-- Error Message Section --}}
     {{-- Displays validation errors or business logic failures --}}
-    {{-- Helps users understand and fix issues --}}
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+    {{-- Pink background matching Wireframe 7 design --}}
+    @if(session('error') || $errors->any())
+        <div class="alert alert-danger" style="background-color: #f8d7da; border-color: #f5c6cb; color: #721c24;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            @if(session('error'))
+                De productgegevens kunnen niet worden gewijzigd
+            @endif
+            @if($errors->any())
+                <div class="mt-2">
+                    @foreach($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
     @endif
 
     {{-- Product Information Display Section --}}
@@ -106,6 +119,11 @@
                     <td><strong>Ontvangstdatum</strong></td>
                     <td>{{ $stockInfo['received_date'] ? date('d-m-Y', strtotime($stockInfo['received_date'])) : date('d-m-Y') }}</td>
                 </tr>
+                {{-- Delivery Date Row - When stock was delivered --}}
+                <tr>
+                    <td><strong>Uitleveringsdatum</strong></td>
+                    <td>{{ $stockInfo['delivery_date'] ? date('d-m-Y', strtotime($stockInfo['delivery_date'])) : date('d-m-Y') }}</td>
+                </tr>
             </table>
         </div>
     </div>
@@ -124,22 +142,30 @@
                 {{-- Main editable field for updating stock quantities --}}
                 <div class="mb-3">
                     <label for="delivered_quantity" class="form-label"><strong>Aantal uitgeleverde producten:</strong></label>
-                    <input type="number" class="form-control" id="delivered_quantity" name="delivered_quantity"
+                    <input type="number" class="form-control @if(session('error') || $errors->has('delivered_quantity')) is-invalid @endif" 
+                           id="delivered_quantity" name="delivered_quantity"
                            value="{{ old('delivered_quantity', $stockInfo['delivered_quantity'] ?? 0) }}"
                            required min="0">
-                    {{-- Display validation errors for this field --}}
-                    @error('delivered_quantity')<div class="text-danger">{{ $message }}</div>@enderror
+                    
+                    {{-- Error messages specifically for this field matching Wireframe 7 --}}
+                    @if(session('error') && str_contains(session('error'), 'meer producten uitgeleverd'))
+                        <div class="text-danger mt-1" style="font-size: 0.875rem;">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Er worden meer producten uitgeleverd dan er in voorraad zijn
+                        </div>
+                    @endif
+                    
+                    {{-- Display other validation errors for this field --}}
+                    @error('delivered_quantity')
+                        <div class="text-danger mt-1" style="font-size: 0.875rem;">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
 
-                {{-- Delivery Date Field --}}
-                {{-- Optional field for tracking when products were delivered --}}
-                <div class="mb-3">
-                    <label for="delivery_date" class="form-label"><strong>Uitleveringsdatum</strong></label>
-                    <input type="date" class="form-control" id="delivery_date" name="delivery_date"
-                           value="{{ old('delivery_date', $stockInfo['delivery_date'] ?? date('Y-m-d')) }}">
-                    {{-- Display validation errors for this field --}}
-                    @error('delivery_date')<div class="text-danger">{{ $message }}</div>@enderror
-                </div>
+                {{-- Hidden field to maintain current delivery date --}}
+                <input type="hidden" name="delivery_date" value="{{ $stockInfo['delivery_date'] ?? date('Y-m-d') }}">
 
                 {{-- Current Stock Display Field --}}
                 {{-- Read-only field showing calculated current stock levels --}}
